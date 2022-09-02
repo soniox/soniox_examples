@@ -19,8 +19,8 @@ def main():
         print(f"File ID: {file_id}")
 
         while True:
-            print("Calling GetTranscribeAsyncFileStatus.")
-            status = client.GetTranscribeAsyncFileStatus(file_id)
+            print("Calling GetTranscribeAsyncStatus.")
+            status = client.GetTranscribeAsyncStatus(file_id)
             print(f"Status: {status.status}")
             if status.status in ("COMPLETED", "FAILED"):
                 break
