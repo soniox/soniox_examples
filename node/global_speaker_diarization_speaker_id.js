@@ -64,7 +64,7 @@ const speechClient = new SpeechClient();
 
   // Simulate data streaming
   for await (const chunk of readable) {
-    stream.writeAsync(chunk);
+    await stream.writeAsync(chunk);
   }
 
   stream.end();

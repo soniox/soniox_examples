@@ -10,47 +10,39 @@ const { SpeechClient } = require("@soniox/soniox-node");
 const speechClient = new SpeechClient();
 
 (async function () {
+  const words = [];
+
   const onDataHandler = async (result) => {
-    let speaker = "";
-    let sentence = "";
-
     for (const word of result.words) {
-      if (word.speaker !== speaker) {
-        console.log(sentence);
-        speaker = word.speaker;
-        sentence = `Speaker ${speaker}: ${word.text}`;
-      } else {
-        sentence += ` ${word.text}`;
-      }
+        words.push(word);
+        if (word.text == "<end>") {
+            console.log(words.map((word) => word.text).join(" "));
+            words.length = 0;
+        }
     }
-
-    console.log(sentence);
   };
 
   const onEndHandler = (error) => {
     if (error) {
-      console.log(error);
+        console.log("Error!", error);
     }
   };
 
-  // transcribeStream returns object with ".writeAsync()" and ".end()" methods
-  // use them to send data and end stream when done.
   const stream = speechClient.transcribeStream(
     {
-      enable_global_speaker_diarization: true,
-      min_num_speakers: 1,
-      max_num_speakers: 6,
+        model: "precision_ivr",
+        enable_endpoint_detection: true,
+        include_nonfinal: false,
     },
     onDataHandler,
     onEndHandler
   );
 
   const CHUNK_SIZE = 1024;
-  const readable = fs.createReadStream("../test_data/test_audio_sd.flac", {
+  const readable = fs.createReadStream("../test_data/test_audio_ivr.flac", {
     highWaterMark: CHUNK_SIZE,
   });
 
-  // Simulate data streaming
   for await (const chunk of readable) {
     await stream.writeAsync(chunk);
   }

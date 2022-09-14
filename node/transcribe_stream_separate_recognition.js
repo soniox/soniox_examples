@@ -44,7 +44,7 @@ const speechClient = new SpeechClient();
 
   // Simulate data streaming
   for await (const audioChunk of streamSource) {
-    stream.writeAsync(audioChunk);
+    await stream.writeAsync(audioChunk);
   }
 
   stream.end();
