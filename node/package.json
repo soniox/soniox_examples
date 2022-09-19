@@ -7,8 +7,6 @@
     "name": "Soniox Inc."
   },
   "dependencies": {
-    "@grpc/grpc-js": "^1.6.10",
-    "@grpc/proto-loader": "^0.7.2",
-    "@soniox/soniox-node": "^1.0.1"
+    "@soniox/soniox-node": "*"
   }
 }
