@@ -17,7 +17,6 @@ const speechClient = new SpeechClient();
     {
       num_audio_channels: 2,
       enable_separate_recognition_per_channel: true,
-      transcribe_async_mode: "instant_file",
     }
   );
   console.log(`File ID: ${file_id}`);

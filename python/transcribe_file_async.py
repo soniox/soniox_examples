@@ -9,10 +9,7 @@ def main():
     with SpeechClient() as client:
         print("Uploading file.")
         file_id = transcribe_file_async(
-            "../test_data/test_audio_long.flac",
-            client,
-            transcribe_async_mode="instant_file",
-            reference_name="test",
+            "../test_data/test_audio_long.flac", client, reference_name="test"
         )
         print(f"File ID: {file_id}")
 

@@ -13,10 +13,7 @@ const speechClient = new SpeechClient();
   console.log("Uploading file.");
   const file_id = await speechClient.transcribeFileAsync(
     "../test_data/test_audio_long.flac",
-    "test_file", // reference_name
-    {
-      transcribe_async_mode: "instant_file",
-    }
+    "test", // reference_name
   );
   console.log(`File ID: ${file_id}`);
 

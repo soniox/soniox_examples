@@ -14,7 +14,6 @@ def main():
             audio_format="pcm_s16le",
             sample_rate_hertz=16000,
             num_audio_channels=1,
-            transcribe_async_mode="instant_file",
             reference_name="test",
         )
         print(f"File ID: {file_id}")

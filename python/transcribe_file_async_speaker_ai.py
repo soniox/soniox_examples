@@ -16,7 +16,6 @@ def main():
             max_num_speakers=6,
             enable_speaker_identification=True,
             cand_speaker_names=["John", "Judy"],
-            transcribe_async_mode="instant_file",
             reference_name="test",
         )
         print(f"File ID: {file_id}")

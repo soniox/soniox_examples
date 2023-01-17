@@ -13,7 +13,6 @@ def main():
             client,
             num_audio_channels=2,
             enable_separate_recognition_per_channel=True,
-            transcribe_async_mode="instant_file",
             reference_name="test",
         )
         print(f"File ID: {file_id}")
