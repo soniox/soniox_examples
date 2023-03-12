@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<body>
+<button id="start-button">Start</button>
+<button id="stop-button">Stop</button>
+<button id="cancel-button">Cancel</button>
+<br>
+<span id="transcript-final"></span>
+<span id="transcript-nonfinal" style="color: dodgerblue"></span>
+<br>
+<script src="https://js.soniox.com/soniox-web-voice.js"></script>
+<script>
+
+let apikey = "YOUR_API_KEY";
+
+let transcriptFinal = document.getElementById("transcript-final");
+let transcriptNonFinal = document.getElementById("transcript-nonfinal");
+let recordTranscribe = null;
+
+document.getElementById("start-button").onclick = function() {
+  if (recordTranscribe != null) {
+    recordTranscribe.cancel();
+  }
+  transcriptFinal.textContent = "";
+  transcriptNonFinal.textContent = "";
+
+  recordTranscribe = new sonioxWebVoice.RecordTranscribe();
+  recordTranscribe.setApiKey(apikey);
+  recordTranscribe.setIncludeNonFinal(true);
+  recordTranscribe.setOnStarted(onStarted);
+  recordTranscribe.setOnPartialResult(onPartialResult);
+  recordTranscribe.setOnFinished(onFinished);
+  recordTranscribe.setOnError(onError);
+
+  recordTranscribe.start();
+  console.log("State: " + recordTranscribe.getState());
+};
+document.getElementById("stop-button").onclick = function() {
+  if (recordTranscribe != null) {
+    recordTranscribe.stop();
+    console.log("State: " + recordTranscribe.getState());
+  }
+};
+document.getElementById("cancel-button").onclick = function() {
+  if (recordTranscribe != null) {
+    recordTranscribe.cancel();
+    console.log("State: " + recordTranscribe.getState());
+  }
+};
+
+function onStarted() {
+  console.log("onStarted");
+  console.log("State: " + recordTranscribe.getState());
+}
+
+function onPartialResult(result) {
+  console.log("onPartialResult");
+  console.log(result);
+  transcriptNonFinal.textContent = "";
+  result.words.forEach(function (word) {
+    var text = word.text + " ";
+    if (word.is_final) {
+      transcriptFinal.textContent += text;
+    } else {
+      transcriptNonFinal.textContent += text;
+    }
+  });
+}
+
+function onFinished() {
+  console.log("onFinished");
+  console.log("State: " + recordTranscribe.getState());
+}
+
+function onError(status, message) {
+  console.log("onError status=" + status + ", message=" + message);
+  console.log("State: " + recordTranscribe.getState());
+}
+
+</script>
+</body>
+</html>
