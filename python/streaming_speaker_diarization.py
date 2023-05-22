@@ -1,15 +1,24 @@
-from soniox.transcribe_live import transcribe_capture
-from soniox.capture_device import SimulatedCaptureDevice
-from soniox.speech_service import SpeechClient, set_api_key
+from typing import Iterable
+from soniox.transcribe_live import transcribe_stream
+from soniox.speech_service import SpeechClient
 
-set_api_key("<YOUR-API-KEY>")
+
+def iter_audio() -> Iterable[bytes]:
+    with open("../test_data/test_audio_sd.flac", "rb") as fh:
+        while True:
+            audio = fh.read(1024)
+            if len(audio) == 0:
+                break
+            yield audio
 
 
 def main():
     with SpeechClient() as client:
-        sim_capture = SimulatedCaptureDevice("../test_data/test_audio_sd.raw")
-        for result in transcribe_capture(
-            sim_capture, client, enable_streaming_speaker_diarization=True
+        for result in transcribe_stream(
+            iter_audio(),
+            client,
+            enable_streaming_speaker_diarization=True,
+            include_nonfinal=True,
         ):
             print(" ".join(f"{w.text}/{w.speaker}" for w in result.words))
 

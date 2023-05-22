@@ -15,7 +15,9 @@ const speechClient = new SpeechClient();
   };
 
   const onEndHandler = (error) => {
-    console.log("END!", error);
+    if (error) {
+      console.log(`Transcription error: ${error}`);
+    }
   };
 
   // transcribeStream returns object with ".writeAsync()" and ".end()" methods
@@ -26,6 +28,7 @@ const speechClient = new SpeechClient();
     onEndHandler
   );
 
+  // Here we simulate the stream by reading a file in small chunks.
   const CHUNK_SIZE = 1024;
   const readable = fs.createReadStream("../test_data/test_audio_long.flac", {
     highWaterMark: CHUNK_SIZE,

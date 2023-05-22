@@ -29,6 +29,10 @@ if (status.Status == "COMPLETED")
     Result result = (completeResult as SingleResult)!.Result;
     Console.WriteLine(string.Join(" ", result.Words.Select(word => word.Text).ToList()));
 }
+else
+{
+    Console.WriteLine($"Transcription failed with error: {status.ErrorMessage}");
+}
 
 Console.WriteLine("Calling DeleteTranscribeAsyncFile.");
 await client.DeleteTranscribeAsyncFile(fileId);

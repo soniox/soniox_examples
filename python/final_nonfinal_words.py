@@ -1,7 +1,5 @@
 from soniox.transcribe_live import transcribe_stream
-from soniox.speech_service import SpeechClient, set_api_key
-
-set_api_key("<YOUR-API-KEY>")
+from soniox.speech_service import SpeechClient
 
 
 def iter_audio():
@@ -15,6 +13,7 @@ def iter_audio():
 
 def main():
     with SpeechClient() as client:
+        # All final words will be collected in this list.
         all_final_words = []
 
         for result in transcribe_stream(iter_audio(), client):
@@ -27,7 +26,7 @@ def main():
                 else:
                     non_final_words.append(word.text)
 
-            # Append current final words to a list of all final words.
+            # Append current final words to all final words.
             all_final_words += final_words
 
             # Print all final words and current non-final words.

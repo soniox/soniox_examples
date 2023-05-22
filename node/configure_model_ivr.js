@@ -14,25 +14,25 @@ const speechClient = new SpeechClient();
 
   const onDataHandler = async (result) => {
     for (const word of result.words) {
-        words.push(word);
-        if (word.text == "<end>") {
-            console.log(words.map((word) => word.text).join(" "));
-            words.length = 0;
-        }
+      words.push(word);
+      if (word.text == "<end>") {
+        console.log(words.map((word) => word.text).join(" "));
+        words.length = 0;
+      }
     }
   };
 
   const onEndHandler = (error) => {
     if (error) {
-        console.log("Error!", error);
+      console.log(`Transcription error: ${error}`);
     }
   };
 
   const stream = speechClient.transcribeStream(
     {
-        model: "precision_ivr",
-        enable_endpoint_detection: true,
-        include_nonfinal: false,
+      model: "precision_ivr",
+      enable_endpoint_detection: true,
+      include_nonfinal: false,
     },
     onDataHandler,
     onEndHandler

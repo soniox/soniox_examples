@@ -15,13 +15,15 @@ const speechClient = new SpeechClient();
   };
 
   const onEndHandler = (error) => {
-    console.log("END!", error);
+    if (error) {
+      console.log(`Transcription error: ${error}`);
+    }
   };
 
   // transcribeStream returns object with ".writeAsync()" and ".end()" methods
   // use them to send data and end stream when done.
   const stream = speechClient.transcribeStream(
-    { 
+    {
       audio_format: "pcm_s16le",
       sample_rate_hertz: 16000,
       num_audio_channels: 1,
@@ -31,6 +33,7 @@ const speechClient = new SpeechClient();
     onEndHandler
   );
 
+  // Here we simulate the stream by reading a file in small chunks.
   const CHUNK_SIZE = 1024;
   const readable = fs.createReadStream("../test_data/test_audio_long.raw", {
     highWaterMark: CHUNK_SIZE,

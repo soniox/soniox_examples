@@ -1,8 +1,6 @@
 from typing import Iterable
 from soniox.transcribe_live import transcribe_stream
-from soniox.speech_service import SpeechClient, set_api_key
-
-set_api_key("<YOUR-API-KEY>")
+from soniox.speech_service import SpeechClient
 
 
 def iter_audio() -> Iterable[bytes]:

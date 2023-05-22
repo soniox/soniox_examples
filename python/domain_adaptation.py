@@ -1,9 +1,6 @@
 import os
 from soniox.transcribe_file import transcribe_file_short
-from soniox.speech_service import SpeechClient, SpeechContext, SpeechContextEntry, set_api_key
-
-
-set_api_key("<YOUR-API-KEY>")
+from soniox.speech_service import SpeechClient, SpeechContext, SpeechContextEntry
 
 
 # Loads the domain vocabulary from a file into a new SpeechContext.

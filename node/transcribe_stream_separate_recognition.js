@@ -19,7 +19,9 @@ const speechClient = new SpeechClient();
   };
 
   const onEndHandler = (error) => {
-    console.log("END!", error);
+    if (error) {
+      console.log(`Transcription error: ${error}`);
+    }
   };
 
   // transcribeStream returns object with ".writeAsync()" and ".end()" methods

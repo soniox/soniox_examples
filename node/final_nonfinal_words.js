@@ -10,7 +10,9 @@ const { SpeechClient } = require("@soniox/soniox-node");
 const speechClient = new SpeechClient();
 
 (async function () {
+  // All final words will be collected in this list.
   let all_final_words = [];
+
   const onDataHandler = async (result) => {
     if (!result) {
       return;
@@ -27,6 +29,7 @@ const speechClient = new SpeechClient();
       }
     }
 
+    // Append current final words to all final words.
     all_final_words = all_final_words.concat(final_words);
 
     console.log(`Final: ${all_final_words.join(" ")}`);
@@ -35,7 +38,9 @@ const speechClient = new SpeechClient();
   };
 
   const onEndHandler = (error) => {
-    console.log("END!", error);
+    if (error) {
+      console.log(`Transcription error: ${error}`);
+    }
   };
 
   // transcribeStream returns object with ".writeAsync()" and ".end()" methods

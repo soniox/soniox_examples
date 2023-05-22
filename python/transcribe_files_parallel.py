@@ -1,10 +1,8 @@
 import argparse
 import glob
 from multiprocessing import Pool
-from soniox.speech_service import Result, SpeechClient, set_api_key
+from soniox.speech_service import Result, SpeechClient
 from soniox.transcribe_file import transcribe_file_stream
-
-set_api_key("<YOUR-API-KEY>")
 
 
 def process_file(audio_fn: str) -> None:

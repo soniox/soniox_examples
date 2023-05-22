@@ -16,5 +16,5 @@ const speechClient = new SpeechClient();
     }
   );
 
-  console.log(`Words: ${result.words.map((word) => word.text).join(" ")}`);
+  console.log(result.words.map((word) => word.text).join(" "));
 })();

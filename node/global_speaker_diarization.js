@@ -29,7 +29,7 @@ const speechClient = new SpeechClient();
 
   const onEndHandler = (error) => {
     if (error) {
-      console.log(error);
+      console.log(`Transcription error: ${error}`)
     }
   };
 

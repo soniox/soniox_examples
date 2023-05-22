@@ -1,7 +1,5 @@
 from soniox.transcribe_file import transcribe_file_short
-from soniox.speech_service import SpeechClient, SpeechContext, SpeechContextEntry, set_api_key
-
-set_api_key("<YOUR-API-KEY>")
+from soniox.speech_service import SpeechClient, SpeechContext, SpeechContextEntry
 
 
 def test(client: SpeechClient, audio_file: str, speech_context: SpeechContext) -> None:

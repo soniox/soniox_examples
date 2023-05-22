@@ -1,8 +1,6 @@
 import time
-from soniox.speech_service import SpeechClient, set_api_key
+from soniox.speech_service import SpeechClient
 from soniox.transcribe_file import transcribe_file_async
-
-set_api_key("<YOUR-API-KEY>")
 
 
 def main():
