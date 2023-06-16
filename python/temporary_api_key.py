@@ -6,6 +6,7 @@ def main():
     with SpeechClient() as client:
         response = client.CreateTemporaryApiKey(
             usage_type="transcribe_websocket",
+            expires_in_s=300,
             client_request_reference="test_reference",
         )
 

@@ -11,6 +11,7 @@ const speechClient = new SpeechClient();
 (async function () {
     const response = await speechClient.createTemporaryApiKey({
         usage_type: "transcribe_websocket",
+        expires_in_s: 300,
         client_request_reference: "test_reference",
     });
 
