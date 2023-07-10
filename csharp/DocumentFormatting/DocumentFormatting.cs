@@ -46,7 +46,7 @@ var docfmtConfig = new Dictionary<string, object> {
 };
 
 var fileId = await client.TranscribeFileAsync(
-    "../../test_data/test_audio_long.flac",
+    "PATH_TO_YOUR_AUDIO_FILE",
     new TranscriptionConfig
     {
         DocumentFormattingConfig = new DocumentFormattingConfig
