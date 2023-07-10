@@ -28,7 +28,7 @@ To use the library in your project, add package references to the
 
 ```
 <PackageReference Include="Google.Protobuf" Version="3.22.1" />
-<PackageReference Include="Soniox.Client" Version="1.0.3" />
+<PackageReference Include="Soniox.Client" Version="1.1.0" />
 ```
 
 You can specify the Soniox API key in the Client constructor instead

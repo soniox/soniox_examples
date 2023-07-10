@@ -5,11 +5,12 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>transcribe_file_async</RootNamespace>
+    <RootNamespace>document_formatting</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Google.Protobuf" Version="3.22.1" />
+    <PackageReference Include="Json.Net" Version="1.0.33" />
     <PackageReference Include="Soniox.Client" Version="1.1.0" />
   </ItemGroup>
 
