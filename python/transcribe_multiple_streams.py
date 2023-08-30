@@ -24,11 +24,13 @@ class Channel:
         for result in transcribe_stream(
             self.iter_audio(),
             self._client,
+            model="en_v2_lowlatency",
+            include_nonfinal=True,
             audio_format="pcm_s16le",
             sample_rate_hertz=16000,
             num_audio_channels=1,
         ):
-            words = " ".join([w.text for w in result.words])
+            words = "".join([w.text for w in result.words])
             print(f"Channel {self._idx}: {words}")
 
 

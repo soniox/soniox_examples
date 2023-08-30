@@ -11,8 +11,8 @@ def main():
 
         # Print transcript tokens and text.
         transcript = stored_object.transcript
-        print([token.text for token in transcript.tokens])
         print(transcript.text)
+        print([token.text for token in transcript.tokens])
 
 
 if __name__ == "__main__":

@@ -14,9 +14,13 @@ def iter_audio() -> Iterable[bytes]:
 
 def main():
     with SpeechClient() as client:
-        for result in transcribe_stream(iter_audio(), client):
-            # Variable result contains final and non-final words.
-            print(" ".join(w.text for w in result.words))
+        for result in transcribe_stream(
+            iter_audio(),
+            client,
+            model="en_v2_lowlatency",
+            include_nonfinal=True,
+        ):
+            print("".join(w.text for w in result.words))
 
 
 if __name__ == "__main__":

@@ -1,6 +1,4 @@
-using System.Linq;
 using System.Runtime.CompilerServices;
-using Soniox.Types;
 using Soniox.Client;
 using Soniox.Client.Proto;
 
@@ -39,13 +37,14 @@ IAsyncEnumerable<Result> resultsEnumerable = client.TranscribeStream(
     EnumerateAudioChunks(),
     new TranscriptionConfig
     {
+        Model = "en_v2_lowlatency",
         IncludeNonfinal = true,
     });
 
 await foreach (var result in resultsEnumerable)
 {
-    // Note result.Words contains final and non-final words,
+    // Note result.Words contains final and non-final tokens,
     // we do not print this this information in this example.
-    var wordsStr = string.Join(" ", result.Words.Select(word => word.Text).ToArray());
-    Console.WriteLine($"Words: {wordsStr}");
+    var text = string.Join("", result.Words.Select(word => word.Text).ToArray());
+    Console.WriteLine(text);
 }

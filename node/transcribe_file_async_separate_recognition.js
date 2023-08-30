@@ -15,6 +15,7 @@ const speechClient = new SpeechClient();
     "../test_data/test_audio_multi_channel.flac",
     "test", // reference_name
     {
+      model: "en_v2",
       num_audio_channels: 2,
       enable_separate_recognition_per_channel: true,
     }
@@ -45,9 +46,7 @@ const speechClient = new SpeechClient();
     );
     for (result of channel_results) {
       console.log(
-        `Channel ${result.channel}: ${result.words
-          .map((word) => word.text)
-          .join(" ")}`
+        `Channel ${result.channel}: ${result.words.map((word) => word.text).join("")}`
       );
     }
   } else {

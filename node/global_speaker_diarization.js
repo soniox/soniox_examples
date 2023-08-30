@@ -10,50 +10,38 @@ const { SpeechClient } = require("@soniox/soniox-node");
 const speechClient = new SpeechClient();
 
 (async function () {
-  const onDataHandler = async (result) => {
-    let speaker = "";
-    let sentence = "";
+    const result = await speechClient.transcribeFileShort(
+        "../test_data/test_audio_sd.flac",
+        {
+            model: "en_v2",
+            enable_global_speaker_diarization: true,
+            min_num_speakers: 1,
+            max_num_speakers: 6,
+        }
+    );
+
+    // Print results with each speaker segment on its own line.
+
+    let speaker = 0;
+    let line = "";
 
     for (const word of result.words) {
-      if (word.speaker !== speaker) {
-        console.log(sentence);
-        speaker = word.speaker;
-        sentence = `Speaker ${speaker}: ${word.text}`;
-      } else {
-        sentence += ` ${word.text}`;
-      }
+        if (word.speaker !== speaker) {
+            if (line.length > 0) {
+                console.log(line);
+            }
+
+            speaker = word.speaker;
+            line = `Speaker ${speaker}: `;
+
+            if (word.text == " ") {
+                // Avoid printing leading space at speaker change.
+                continue;
+            }
+        }
+
+        line += word.text;
     }
 
-    console.log(sentence);
-  };
-
-  const onEndHandler = (error) => {
-    if (error) {
-      console.log(`Transcription error: ${error}`)
-    }
-  };
-
-  // transcribeStream returns object with ".writeAsync()" and ".end()" methods
-  // use them to send data and end stream when done.
-  const stream = speechClient.transcribeStream(
-    {
-      enable_global_speaker_diarization: true,
-      min_num_speakers: 1,
-      max_num_speakers: 6,
-    },
-    onDataHandler,
-    onEndHandler
-  );
-
-  const CHUNK_SIZE = 1024;
-  const readable = fs.createReadStream("../test_data/test_audio_sd.flac", {
-    highWaterMark: CHUNK_SIZE,
-  });
-
-  // Simulate data streaming
-  for await (const chunk of readable) {
-    await stream.writeAsync(chunk);
-  }
-
-  stream.end();
+    console.log(line);
 })();

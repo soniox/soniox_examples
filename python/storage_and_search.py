@@ -13,8 +13,12 @@ def main():
             },
             title="Air Jordan shoes review",
         )
+
         transcribe_file_short(
-            "../test_data/test_audio_storage.flac", client, storage_config=storage_config
+            "../test_data/test_audio_storage.flac",
+            client,
+            model="en_v2",
+            storage_config=storage_config,
         )
 
         # Search for objects with query "homesick".

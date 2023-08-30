@@ -14,6 +14,9 @@ const speechClient = new SpeechClient();
   const file_id = await speechClient.transcribeFileAsync(
     "../test_data/test_audio_long.flac",
     "test", // reference_name
+    {
+      model: "en_v2",
+    }
   );
   console.log(`File ID: ${file_id}`);
 
@@ -38,7 +41,7 @@ const speechClient = new SpeechClient();
   if (status === "COMPLETED") {
     console.log("Calling getTranscribeAsyncResult");
     const result = await speechClient.getTranscribeAsyncResult(file_id);
-    console.log(`Words: ${result.words.map((word) => word.text).join(" ")}`);
+    console.log("Text: " + result.words.map((word) => word.text).join(""));
   } else {
     console.log(`Transcription failed with error: ${error_message}`);
   }

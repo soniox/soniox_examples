@@ -11,7 +11,7 @@ const speechClient = new SpeechClient();
 
 (async function () {
   const onDataHandler = async (result) => {
-    console.log(`Words: ${result.words.map((word) => word.text).join(" ")}`);
+    console.log(result.words.map((word) => word.text).join(""));
   };
 
   const onEndHandler = (error) => {
@@ -24,6 +24,7 @@ const speechClient = new SpeechClient();
   // use them to send data and end stream when done.
   const stream = speechClient.transcribeStream(
     {
+      model: "en_v2_lowlatency",
       audio_format: "pcm_s16le",
       sample_rate_hertz: 16000,
       num_audio_channels: 1,

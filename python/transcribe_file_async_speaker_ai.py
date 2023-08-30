@@ -9,6 +9,7 @@ def main():
         file_id = transcribe_file_async(
             "../test_data/test_audio_sd.flac",
             client,
+            model="en_v2",
             enable_global_speaker_diarization=True,
             min_num_speakers=1,
             max_num_speakers=6,
@@ -30,23 +31,23 @@ def main():
             print("Calling GetTranscribeAsyncResult")
             result = client.GetTranscribeAsyncResult(file_id)
 
-            speaker = None
-            speaker_num_to_name = {}
             speaker_num_to_name = {entry.speaker: entry.name for entry in result.speakers}
+            speaker = None
+            line = ""
             for word in result.words:
                 if word.speaker != speaker:
-                    if speaker is not None:
-                        print()
+                    if len(line) > 0:
+                        print(line)
                     speaker = word.speaker
                     if speaker in speaker_num_to_name:
                         speaker_name = speaker_num_to_name[speaker]
                     else:
                         speaker_name = "unknown"
-                    print(f"Speaker {speaker} ({speaker_name}): ", end="")
-                else:
-                    print(" ", end="")
-                print(word.text, end="")
-            print()
+                    line = f"Speaker {speaker} ({speaker_name}): "
+                    if word.text == " ":
+                        continue
+                line += word.text
+            print(line)
         else:
             print(f"Transcription failed with error: {status.error_message}")
 

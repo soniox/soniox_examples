@@ -17,10 +17,11 @@ def main():
         for result in transcribe_stream(
             iter_audio(),
             client,
-            enable_streaming_speaker_diarization=True,
+            model="en_v2_lowlatency",
             include_nonfinal=True,
+            enable_streaming_speaker_diarization=True,
         ):
-            print(" ".join(f"{w.text}/{w.speaker}" for w in result.words))
+            print(" ".join(f"'{w.text}'/{w.speaker}" for w in result.words))
 
 
 if __name__ == "__main__":

@@ -7,7 +7,10 @@ def main():
     with SpeechClient() as client:
         print("Uploading file.")
         file_id = transcribe_file_async(
-            "../test_data/test_audio_long.flac", client, reference_name="test"
+            "../test_data/test_audio_long.flac",
+            client,
+            model="en_v2",
+            reference_name="test",
         )
         print(f"File ID: {file_id}")
 
@@ -22,7 +25,7 @@ def main():
         if status.status == "COMPLETED":
             print("Calling GetTranscribeAsyncResult")
             result = client.GetTranscribeAsyncResult(file_id)
-            print("Words: " + " ".join(w.text for w in result.words))
+            print(f"Text: " + "".join(word.text for word in result.words))
         else:
             print(f"Transcription failed with error: {status.error_message}")
 

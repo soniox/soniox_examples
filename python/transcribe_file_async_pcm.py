@@ -9,6 +9,7 @@ def main():
         file_id = transcribe_file_async(
             "../test_data/test_audio_long.raw",
             client,
+            model="en_v2",
             audio_format="pcm_s16le",
             sample_rate_hertz=16000,
             num_audio_channels=1,
@@ -27,7 +28,7 @@ def main():
         if status.status == "COMPLETED":
             print("Calling GetTranscribeAsyncResult")
             result = client.GetTranscribeAsyncResult(file_id)
-            print("Words: " + " ".join(w.text for w in result.words))
+            print(f"Text: " + "".join(word.text for word in result.words))
         else:
             print(f"Transcription failed with error: {status.error_message}")
 

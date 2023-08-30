@@ -9,6 +9,7 @@ def main():
         file_id = transcribe_file_async(
             "../test_data/test_audio_multi_channel.flac",
             client,
+            model="en_v2",
             num_audio_channels=2,
             enable_separate_recognition_per_channel=True,
             reference_name="test",
@@ -27,7 +28,7 @@ def main():
             print("Calling GetTranscribeAsyncResult")
             channel_results = client.GetTranscribeAsyncResult(file_id)
             for result in channel_results:
-                print(f"Channel {result.channel}: " + " ".join(word.text for word in result.words))
+                print(f"Channel {result.channel}: " + "".join(word.text for word in result.words))
         else:
             print(f"Transcription failed with error: {status.error_message}")
 

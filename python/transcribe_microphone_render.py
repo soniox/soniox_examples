@@ -29,7 +29,7 @@ def render_final_words(words: List[str]) -> List[str]:
     clear_line()
     clear_line()
 
-    line = " ".join(words)
+    line = "".join(words)
     if len(line) <= MAX_CHAR_PER_LINE:
         print(line)
         return words
@@ -49,7 +49,7 @@ def render_final_words(words: List[str]) -> List[str]:
 
 def render_non_final_words(words: List[str]) -> None:
     if len(words) > 0:
-        line = " ".join(words)
+        line = "".join(words)
         print(f"\n: {line}", end="")
     else:
         print("")
@@ -69,7 +69,12 @@ def main():
 
         final_words_last_line = []
 
-        for result in transcribe_microphone(client, stop_event=stop_event):
+        for result in transcribe_microphone(
+            client,
+            model="en_v2_lowlatency",
+            include_nonfinal=True,
+            stop_event=stop_event,
+        ):
             # Split words into final words and non-final words.
             new_final_words, non_final_words = split_words(result)
 

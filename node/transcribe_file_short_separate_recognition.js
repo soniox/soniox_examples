@@ -12,6 +12,7 @@ const speechClient = new SpeechClient();
   const channel_results = await speechClient.transcribeFileShort(
     "../test_data/test_audio_multi_channel.flac",
     {
+      model: "en_v2",
       num_audio_channels: 2,
       enable_separate_recognition_per_channel: true,
     }
@@ -19,9 +20,7 @@ const speechClient = new SpeechClient();
 
   for (const result of channel_results) {
     console.log(
-      `Channel ${result.channel}: ${result.words
-        .map((word) => word.text)
-        .join(" ")}`
+      `Channel ${result.channel}: ${result.words.map((word) => word.text).join("")}`
     );
   }
 })();

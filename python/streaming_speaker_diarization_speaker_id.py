@@ -17,6 +17,8 @@ def main():
         for result in transcribe_stream(
             iter_audio(),
             client,
+            model="en_v2_lowlatency",
+            include_nonfinal=True,
             enable_streaming_speaker_diarization=True,
             enable_speaker_identification=True,
             cand_speaker_names=["John", "Judy"],
@@ -29,7 +31,7 @@ def main():
                 else:
                     return "unknown"
 
-            print(" ".join(f"{w.text}/{w.speaker}({get_name(w.speaker)})" for w in result.words))
+            print(" ".join(f"'{w.text}'/{w.speaker}({get_name(w.speaker)})" for w in result.words))
 
 
 if __name__ == "__main__":

@@ -9,11 +9,16 @@ const { SpeechClient } = require("@soniox/soniox-node");
 const speechClient = new SpeechClient();
 
 (async function () {
-  const result = await speechClient.transcribeFileShort(
-    "../test_data/test_audio.flac"
-  );
+    const result = await speechClient.transcribeFileShort(
+        "../test_data/test_audio.flac",
+        {
+            model: "en_v2",
+        }
+    );
 
-  for (const word of result.words) {
-    console.log(`${word.text} ${word.start_ms} ${word.duration_ms}`);
-  }
+    console.log("Text: " + result.words.map((word) => word.text).join(""));
+    console.log("Tokens:");
+    for (const word of result.words) {
+        console.log(`    '${word.text}' ${word.start_ms} ${word.duration_ms}`);
+    }
 })();

@@ -17,12 +17,14 @@ def main():
         for result in transcribe_stream(
             iter_audio(),
             client,
+            model="en_v2_lowlatency",
+            include_nonfinal=True,
             audio_format="pcm_s16le",
             sample_rate_hertz=16000,
             num_audio_channels=1,
         ):
             # Variable result contains final and non-final words.
-            print(" ".join(w.text for w in result.words))
+            print("".join(w.text for w in result.words))
 
 
 if __name__ == "__main__":

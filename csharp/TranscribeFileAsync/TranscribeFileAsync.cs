@@ -6,7 +6,11 @@ using var client = new SpeechClient();
 
 var fileId = await client.TranscribeFileAsync(
     "../../test_data/test_audio_long.flac",
-    new TranscriptionConfig { });
+    new TranscriptionConfig
+    {
+        Model = "en_v2",
+        ClientRequestReference = "test",
+    });
 
 Console.WriteLine($"File ID: {fileId}");
 
@@ -27,7 +31,8 @@ if (status.Status == "COMPLETED")
     Console.WriteLine("Calling GetTranscribeAsyncResult");
     var completeResult = await client.GetTranscribeAsyncResult(fileId);
     Result result = (completeResult as SingleResult)!.Result;
-    Console.WriteLine(string.Join(" ", result.Words.Select(word => word.Text).ToList()));
+    var text = string.Join("", result.Words.Select(word => word.Text).ToArray());
+    Console.WriteLine("Text: " + text);
 }
 else
 {

@@ -10,12 +10,12 @@ def process_file(audio_fn: str) -> None:
         # Create output text file.
         output_fn = audio_fn + ".txt"
         with open(output_fn, "w") as output_file:
-            result = transcribe_file_stream(audio_fn, client)
+            result = transcribe_file_stream(audio_fn, client, model="en_v2")
             assert isinstance(result, Result)
 
-            # Write words.
+            # Write text.
             words = [word.text for word in result.words]
-            output_file.write(" ".join(words) + "\n")
+            output_file.write("".join(words) + "\n")
 
             # Write total processed audio duration.
             duration_ms = result.final_proc_time_ms

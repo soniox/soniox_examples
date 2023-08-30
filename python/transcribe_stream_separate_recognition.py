@@ -17,10 +17,12 @@ def main():
         for result in transcribe_stream(
             iter_audio(),
             client,
+            model="en_v2_lowlatency",
+            include_nonfinal=True,
             num_audio_channels=2,
             enable_separate_recognition_per_channel=True,
         ):
-            print(f"Channel {result.channel}: " + " ".join(w.text for w in result.words))
+            print(f"Channel {result.channel}: " + "".join(w.text for w in result.words))
 
 
 if __name__ == "__main__":
