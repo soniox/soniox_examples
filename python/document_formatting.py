@@ -51,6 +51,7 @@ def main():
             "PATH_TO_YOUR_AUDIO_FILE",
             client,
             reference_name="test",
+            model="en_v2",
             document_formatting_config=DocumentFormattingConfig(
                 config_json=json.dumps(docfmt_config)
             ),

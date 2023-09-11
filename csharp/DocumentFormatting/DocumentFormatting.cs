@@ -49,6 +49,7 @@ var fileId = await client.TranscribeFileAsync(
     "PATH_TO_YOUR_AUDIO_FILE",
     new TranscriptionConfig
     {
+        Model = "en_v2",
         DocumentFormattingConfig = new DocumentFormattingConfig
         {
             ConfigJson = JsonNet.Serialize(docfmtConfig),
