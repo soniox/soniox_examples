@@ -8,7 +8,7 @@
 <span id="transcript-final"></span>
 <span id="transcript-nonfinal" style="color: dodgerblue"></span>
 <br>
-<script src="https://js.soniox.com/soniox-web-voice.js"></script>
+<script src="https://js.soniox.com/soniox-web-voice2.js"></script>
 <script>
 
 let apikey = "YOUR_API_KEY";
@@ -26,6 +26,7 @@ document.getElementById("start-button").onclick = function() {
 
   recordTranscribe = new sonioxWebVoice.RecordTranscribe();
   recordTranscribe.setApiKey(apikey);
+  recordTranscribe.setModel("en_v2_lowlatency");
   recordTranscribe.setIncludeNonFinal(true);
   recordTranscribe.setOnStarted(onStarted);
   recordTranscribe.setOnPartialResult(onPartialResult);
@@ -58,11 +59,10 @@ function onPartialResult(result) {
   console.log(result);
   transcriptNonFinal.textContent = "";
   result.words.forEach(function (word) {
-    var text = word.text + " ";
     if (word.is_final) {
-      transcriptFinal.textContent += text;
+      transcriptFinal.textContent += word.text;
     } else {
-      transcriptNonFinal.textContent += text;
+      transcriptNonFinal.textContent += word.text;
     }
   });
 }
