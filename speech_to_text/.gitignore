@@ -1,0 +1,14 @@
+__pycache__
+.venv*
+venv*
+.DS_Store
+node_modules
+bin/
+obj/
+vendor/
+target/
+composer-setup.php
+composer.phar
+
+coffee_shop.mp3
+coffee_shop.pcm_s16le
