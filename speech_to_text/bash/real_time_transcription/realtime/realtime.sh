@@ -29,7 +29,6 @@ audio_format="pcm_s16le"
 sample_rate=16000
 num_channels=1
 model="stt-rt-preview"
-language_hints="[]"
 # corresponds to 120ms at 16kHz mono 16-bit little-endian PCM
 chunk_size=3840
 
@@ -68,14 +67,12 @@ echo "Transcription started."
     --arg model "$model" \
     --argjson sample_rate $sample_rate \
     --argjson num_channels $num_channels \
-    --argjson language_hints "$language_hints" \
     '{
       "api_key": $api_key,
       "audio_format": $audio_format,
       "sample_rate": $sample_rate,
       "num_channels": $num_channels,
-      "model": $model,
-      "language_hints": $language_hints
+      "model": $model
     }'
 
   # Stream audio data as base64 encoded string messages as websocat does not
@@ -99,7 +96,7 @@ echo "Transcription started."
   if [ -p "$input_fifo" ]; then
     # Finally, send an empty message to indicate end of stream.
     echo
-    
+
     # Wait websocket receiver to complete
     wait $websocat_pid
   fi

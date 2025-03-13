@@ -16,7 +16,6 @@ type StartRequest struct {
 	AudioFormat   string   `json:"audio_format,omitempty"`
 	SampleRate    int      `json:"sample_rate,omitempty"`
 	NumChannels   int      `json:"num_channels,omitempty"`
-	LanguageHints []string `json:"language_hints,omitempty"`
 }
 
 type Token struct {
@@ -62,8 +61,7 @@ func main() {
 		AudioFormat:   "pcm_s16le",
 		SampleRate:    16000,
 		NumChannels:   1,
-		Model:         "stt-rt-preview",
-		LanguageHints: []string{},
+		Model:         "stt-rt-preview"
 	})
 	if err != nil {
 		panic(err)

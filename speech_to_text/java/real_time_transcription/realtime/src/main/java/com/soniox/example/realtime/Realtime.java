@@ -35,7 +35,6 @@ public class Realtime {
                 startRequest.put("sample_rate", 16000);
                 startRequest.put("num_channels", 1);
                 startRequest.put("model", "stt-rt-preview");
-                startRequest.put("language_hints", new org.json.JSONArray());
 
                 webSocket.sendText(startRequest.toString(), true);
 

@@ -107,7 +107,6 @@ int callback(struct lws *wsi, enum lws_callback_reasons reason,
                 json_object_object_add(start_req, "sample_rate", json_object_new_int(16000));
                 json_object_object_add(start_req, "num_channels", json_object_new_int(1));
                 json_object_object_add(start_req, "model", json_object_new_string("stt-rt-preview"));
-                json_object_object_add(start_req, "language_hints", json_object_new_array());
 
                 const char *start_message = json_object_to_json_string(start_req);
                 size_t start_message_len = strlen(start_message);

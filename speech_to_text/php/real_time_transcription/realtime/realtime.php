@@ -28,8 +28,7 @@ $connector($ws_uri)->then(
                 "audio_format" => "pcm_s16le",
                 "sample_rate" => 16000,
                 "num_channels" => 1,
-                "model" => "stt-rt-preview",
-                "language_hints" => [],
+                "model" => "stt-rt-preview"
             ])
         );
 

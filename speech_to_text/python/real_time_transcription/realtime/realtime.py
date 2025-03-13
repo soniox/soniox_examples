@@ -27,7 +27,6 @@ with connect(WEBSOCKET_URL) as ws:
                 "sample_rate": 16000,
                 "num_channels": 1,
                 "model": "stt-rt-preview",
-                "language_hints": [],
             }
         )
     )
@@ -49,7 +48,7 @@ with connect(WEBSOCKET_URL) as ws:
     # Start a thread to send audio
     send_audio_thread = threading.Thread(target=send_audio)
     send_audio_thread.start()
-    
+
     print("Transcription started.")
 
     # Receive and process text messages
@@ -66,7 +65,7 @@ with connect(WEBSOCKET_URL) as ws:
                 if token.get("text"):
                     # Print out transcribed words
                     print(token["text"], end="", flush=True)
-            
+
             if res.get("finished"):
                 print("\nTranscription done.")
 
