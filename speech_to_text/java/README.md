@@ -18,7 +18,7 @@ mvn compile
 mvn exec:java
 ```
 
-#### Run with Docker
+or run with Docker
 
 ```sh
 cd transcribe_file/remote
@@ -42,7 +42,7 @@ mvn compile
 mvn exec:java
 ```
 
-#### Run with Docker
+or run with Docker
 
 ```sh
 cd transcribe_file/local
@@ -68,7 +68,7 @@ mvn compile
 mvn exec:java
 ```
 
-#### Run with Docker
+or run with Docker
 
 ```sh
 cd real_time_transcription/realtime

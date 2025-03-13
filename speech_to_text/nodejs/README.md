@@ -16,7 +16,7 @@ npm install
 node remote.js
 ```
 
-#### Run with Docker
+or run with Docker
 
 ```sh
 cd transcribe_file/remote
@@ -36,7 +36,7 @@ npm install
 node local.js
 ```
 
-#### Run with Docker
+or run with Docker
 
 ```sh
 cd transcribe_file/local
@@ -58,7 +58,7 @@ npm install
 node realtime.js
 ```
 
-#### Run with Docker
+or run with Docker
 
 ```sh
 cd real_time_transcription/realtime

@@ -17,7 +17,7 @@ cd transcribe_file/remote
 php remote.php
 ```
 
-#### Run with Docker
+or run with Docker
 
 ```sh
 cd transcribe_file/remote
@@ -36,7 +36,7 @@ wget https://soniox.com/media/examples/coffee_shop.mp3
 php local.php
 ```
 
-#### Run with Docker
+or run with Docker
 
 ```sh
 cd transcribe_file/local
@@ -60,7 +60,7 @@ php composer.phar update
 php realtime.php
 ```
 
-#### Run with Docker
+or run with Docker
 
 ```sh
 cd real_time_transcription/realtime

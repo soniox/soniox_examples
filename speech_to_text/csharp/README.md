@@ -17,7 +17,7 @@ cd transcribe_file/Remote
 dotnet run
 ```
 
-#### Run with Docker
+or run with Docker
 
 ```sh
 cd transcribe_file/Remote
@@ -36,7 +36,7 @@ wget https://soniox.com/media/examples/coffee_shop.mp3
 dotnet run
 ```
 
-#### Run with Docker
+or run with Docker
 
 ```sh
 cd transcribe_file/Local
@@ -57,7 +57,7 @@ wget https://soniox.com/media/examples/coffee_shop.pcm_s16le
 dotnet run
 ```
 
-#### Run with Docker
+or run with Docker
 
 ```sh
 cd real_time_transcription/Realtime

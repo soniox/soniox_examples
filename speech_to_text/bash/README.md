@@ -17,7 +17,7 @@ cd transcribe_file/remote
 ./remote.sh
 ```
 
-#### Run with Docker
+or run with Docker
 
 ```sh
 cd transcribe_file/remote
@@ -38,7 +38,7 @@ wget https://soniox.com/media/examples/coffee_shop.mp3
 ./local.sh
 ```
 
-#### Run with Docker
+or run with Docker
 
 ```sh
 cd transcribe_file/local
@@ -61,7 +61,7 @@ wget https://soniox.com/media/examples/coffee_shop.pcm_s16le
 ./realtime.sh
 ```
 
-#### Run with Docker
+or run with Docker
 
 ```sh
 cd real_time_transcription/realtime

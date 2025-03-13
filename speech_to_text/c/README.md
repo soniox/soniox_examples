@@ -20,7 +20,7 @@ make
 ./remote
 ```
 
-#### Run with Docker
+or run with Docker
 
 ```sh
 cd transcribe_file/remote
@@ -40,7 +40,7 @@ make
 ./local
 ```
 
-#### Run with Docker
+or run with Docker
 
 ```sh
 cd transcribe_file/local
@@ -62,7 +62,7 @@ wget https://soniox.com/media/examples/coffee_shop.pcm_s16le
 ./websocket
 ```
 
-#### Run with Docker
+or run with Docker
 
 ```sh
 cd real_time_transcription/realtime

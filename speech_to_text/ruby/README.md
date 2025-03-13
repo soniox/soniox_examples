@@ -15,7 +15,7 @@ cd transcribe_file/remote
 ruby remote.rb
 ```
 
-#### Run with Docker
+or run with Docker
 
 ```sh
 cd transcribe_file/remote
@@ -34,7 +34,7 @@ wget https://soniox.com/media/examples/coffee_shop.mp3
 ruby local.rb
 ```
 
-#### Run with Docker
+or run with Docker
 
 ```sh
 cd transcribe_file/local
@@ -56,7 +56,7 @@ bundle install
 ruby realtime.rb
 ```
 
-#### Run with Docker
+or run with Docker
 
 ```sh
 cd real_time_transcription/realtime

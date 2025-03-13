@@ -18,7 +18,7 @@ pip install -r requirements.txt
 python3 remote.py
 ```
 
-#### Run with Docker
+or run with Docker
 
 ```sh
 cd transcribe_file/remote
@@ -44,7 +44,7 @@ pip install -r requirements.txt
 python3 local.py
 ```
 
-#### Run with Docker
+or run with Docker
 
 ```sh
 cd transcribe_file/local
@@ -70,7 +70,7 @@ pip install -r requirements.txt
 python3 language_hints.py
 ```
 
-#### Run with Docker
+or run with Docker
 
 ```sh
 cd transcribe_file/language_hints
@@ -95,7 +95,7 @@ pip install -r requirements.txt
 python3 speaker_tags.py
 ```
 
-#### Run with Docker
+or run with Docker
 
 ```sh
 cd transcribe_file/speaker_tags
@@ -110,6 +110,31 @@ docker run --rm -it \
     python3 speaker_tags.py'
 ```
 
+**Transcription with context:**
+
+```sh
+cd transcribe_file/context
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python3 context.py
+```
+
+or run with Docker
+
+```sh
+cd transcribe_file/context
+docker run --rm -it \
+    -e SONIOX_API_KEY=$SONIOX_API_KEY \
+    -v `pwd`:/app -w /app \
+    docker.io/alpine sh -c \
+    'apk add -q py3-pip &&
+    python3 -m venv .venv &&
+    source .venv/bin/activate &&
+    pip install -r requirements.txt &&
+    python3 context.py'
+```
+
 ### Real-time transcription over WebSocket
 
 ```sh
@@ -122,7 +147,7 @@ pip install -r requirements.txt
 python3 realtime.py
 ```
 
-#### Run with Docker
+or run with Docker
 
 ```sh
 cd real_time_transcription/realtime
