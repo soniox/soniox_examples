@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <button id="trigger">Start</button>
+    <hr />
+    <div id="transcript"></div>
+    <script>
+        const transcript = document.getElementById('transcript');
+        const trigger = document.getElementById("trigger");
+
+        let ws;
+        let recorder;
+        let isRecording = false;
+
+        trigger.onclick = async () => {
+            if (!isRecording) {
+                transcript.textContent = '';
+
+                // get audio stream from user microphone
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+                // connect to Node.js server
+                ws = new WebSocket("ws://localhost:3001/");
+
+                ws.onopen = () => {
+                    recorder = new MediaRecorder(stream);
+
+                    recorder.ondataavailable = async (event) => {
+                        if (event.data.size > 0) {
+                            // convert the recorded audio chunk (Blob) to raw binary (ArrayBuffer)
+                            // and send via websocket
+                            ws.send(await event.data.arrayBuffer());
+                        }
+                    };
+
+                    recorder.onstop = () => {
+                        // send empty string message to tell the Soniox Real-time API to stop
+                        ws.send("");
+                    };
+
+                    // start recording, creating data chunks every 120ms
+                    recorder.start(120);
+
+                    isRecording = true;
+                    trigger.textContent = "Stop";
+                };
+
+                ws.onmessage = (event) => {
+                    // parse messages received from Node.js server
+                    const message = JSON.parse(event.data);
+
+                    // render into transcript container
+                    transcript.textContent += message.text;
+                };
+
+                ws.onerror = (error) => {
+                    console.error("WebSocket error:", error);
+                    stopRecording();
+                };
+
+                ws.onclose = (event) => {
+                    console.log("WebSocket connection closed", event.code);
+                    stopRecording();
+                };
+            } else {
+                stopRecording();
+            }
+        };
+
+        function stopRecording() {
+            if (recorder) {
+                // stop microphone recording properly
+                recorder.stop();
+                recorder.stream.getTracks().forEach((t) => t.stop());
+            }
+            isRecording = false;
+            trigger.textContent = "Start";
+        }
+    </script>
+</body>
+</html>
