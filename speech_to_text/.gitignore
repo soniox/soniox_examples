@@ -12,3 +12,4 @@ composer.phar
 
 coffee_shop.mp3
 coffee_shop.pcm_s16le
+.env
