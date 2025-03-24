@@ -50,7 +50,7 @@ app.get('/', async (req, res) => {
 
         // create new instance of RecordTranscribe class and authenticate with temp API key
         const recordTranscribe = new RecordTranscribe({
-          apiKey: "${temporaryApiKeyData.api_key}a",
+          apiKey: "${temporaryApiKeyData.api_key}",
         });
         let recordTranscribeState = "stopped"; // "stopped" | "starting" | "running" | "stopping"
 
