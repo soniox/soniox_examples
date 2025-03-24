@@ -11,15 +11,13 @@
 
         let ws;
         let recorder;
-
-        // track status: "stopped" | "starting" | "recording" | "stopping"
-        let status = "stopped";
+        let recorderState = "stopped"; // "stopped" | "starting" | "running" | "stopping"
 
         trigger.onclick = async () => {
-            if (status === "stopped") {
+            if (recorderState === "stopped") {
                 transcript.textContent = "";
                 trigger.textContent = "Starting...";
-                status = "starting";
+                recorderState = "starting";
 
                 // get audio stream from user microphone
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -46,7 +44,7 @@
                     // start recording, creating data chunks every 120ms
                     recorder.start(120);
 
-                    status = "running";
+                    recorderState = "running";
                     trigger.textContent = "Stop";
                 };
 
@@ -67,20 +65,19 @@
                     console.log("WebSocket connection closed", event.code);
                     stopRecording();
                 };
-            } else if (status === "running") {
+            } else if (recorderState === "running") {
                 stopRecording();
             }
         };
 
         function stopRecording() {
-            status = "stopping";
             if (recorder) {
                 // stop microphone recording properly
                 recorder.stop();
                 recorder.stream.getTracks().forEach((t) => t.stop());
             }
             trigger.textContent = "Start";
-            status = "stopped";
+            recorderState = "stopped";
         }
     </script>
 </body>
