@@ -1,4 +1,4 @@
-# Node.js proxy example
+# Node.js proxy stream example
 
 This example demonstrates how to set up a Node.js server as a WebSocket proxy to stream microphone audio from a browser frontend to the Soniox Real-time API.
 

@@ -1,20 +1,25 @@
 <!DOCTYPE html>
 <html>
 <body>
+    <h1>Proxy stream demo</h1>
     <button id="trigger">Start</button>
     <hr />
     <div id="transcript"></div>
     <script>
-        const transcript = document.getElementById('transcript');
+        const transcript = document.getElementById("transcript");
         const trigger = document.getElementById("trigger");
 
         let ws;
         let recorder;
-        let isRecording = false;
+
+        // track status: "stopped" | "starting" | "recording" | "stopping"
+        let status = "stopped";
 
         trigger.onclick = async () => {
-            if (!isRecording) {
-                transcript.textContent = '';
+            if (status === "stopped") {
+                transcript.textContent = "";
+                trigger.textContent = "Starting...";
+                status = "starting";
 
                 // get audio stream from user microphone
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -41,7 +46,7 @@
                     // start recording, creating data chunks every 120ms
                     recorder.start(120);
 
-                    isRecording = true;
+                    status = "running";
                     trigger.textContent = "Stop";
                 };
 
@@ -62,19 +67,20 @@
                     console.log("WebSocket connection closed", event.code);
                     stopRecording();
                 };
-            } else {
+            } else if (status === "running") {
                 stopRecording();
             }
         };
 
         function stopRecording() {
+            status = "stopping";
             if (recorder) {
                 // stop microphone recording properly
                 recorder.stop();
                 recorder.stream.getTracks().forEach((t) => t.stop());
             }
-            isRecording = false;
             trigger.textContent = "Start";
+            status = "stopped";
         }
     </script>
 </body>

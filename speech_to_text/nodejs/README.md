@@ -51,22 +51,22 @@ docker run --rm -it \
 ### Real-time transcription over WebSocket
 
 ```sh
-cd real_time_transcription/realtime
+cd real_time_transcription/basic
 wget https://soniox.com/media/examples/coffee_shop.pcm_s16le
 # ffmpeg -i coffee_shop.mp3 -f s16le -ar 16000 -ac 1 coffee_shop.pcm_s16le
 npm install
-node realtime.js
+node basic.js
 ```
 
 or run with Docker
 
 ```sh
-cd real_time_transcription/realtime
+cd real_time_transcription/basic
 wget https://soniox.com/media/examples/coffee_shop.pcm_s16le
 # ffmpeg -i coffee_shop.mp3 -f s16le -ar 16000 -ac 1 coffee_shop.pcm_s16le
 docker run --rm -it \
     -e SONIOX_API_KEY=$SONIOX_API_KEY \
     -v `pwd`:/app -w /app \
     docker.io/node:22-alpine3.19 sh -c \
-    'npm install && node realtime.js'
+    'npm install && node basic.js'
 ```
