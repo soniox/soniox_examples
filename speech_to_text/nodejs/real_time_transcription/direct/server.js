@@ -6,9 +6,8 @@ const fetch = require('node-fetch');
 const app = express();
 
 
-// fetch temporary API key - we don't want to expose SONIOX_API_KEY on client side
-// https://soniox.com/docs/speech-to-text/api-reference/auth/create_temporary_api_key
 async function getTemporaryApiKey() {
+  // get temporary API key to avoid exposing SONIOX_API_KEY on client side
   const response = await fetch('https://api.soniox.com/v1/auth/temporary-api-key', {
     method: 'POST',
     headers: {
@@ -17,11 +16,11 @@ async function getTemporaryApiKey() {
     },
     body: JSON.stringify({
       usage_type: "transcribe_websocket",
-      expires_in_seconds: 3600 // 1 hour, adjust as needed
+      expires_in_seconds: 300 // 5 minutes, adjust to fit your needs
     })
   });
 
-  if (response.status !== 201) {
+  if (!response.ok) {
     throw new Error(`Failed to get API key. Status: ${response.status}, Response: ${await response.text()}`);
   }
 
