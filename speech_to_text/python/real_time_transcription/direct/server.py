@@ -3,7 +3,7 @@ import requests
 import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 
 load_dotenv()
@@ -15,39 +15,42 @@ app = FastAPI()
 
 @app.get("/", response_class=HTMLResponse)
 async def get_index(request: Request):
-    headers = {
-        "Authorization": f"Bearer {os.getenv('SONIOX_API_KEY')}",
-        "Content-Type": "application/json",
-    }
-    payload = {
-        "usage_type": "transcribe_websocket",
-        "expires_in_seconds": 300,  # 5 minutes, adjust to fit your needs
-    }
-
-    req = requests.post(
-        "https://api.soniox.com/v1/auth/temporary-api-key",
-        headers=headers,
-        json=payload,
+    return templates.TemplateResponse(
+        request=request,
+        name="index.html",
     )
 
-    if req.ok:
-        data = req.json()
-        api_key = data.get("api_key", "")
-        return templates.TemplateResponse(
-            request=request,
-            name="index.html",
-            context={
-                "api_key": api_key,
+
+@app.get("/temporary-api-key", response_class=JSONResponse)
+async def get_temporary_api_key():
+    try:
+        response = requests.post(
+            "https://api.soniox.com/v1/auth/temporary-api-key",
+            headers={
+                "Authorization": f"Bearer {os.getenv('SONIOX_API_KEY')}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "usage_type": "transcribe_websocket",
+                "expires_in_seconds": 60,  # enough to initialize the WebSocket connection
             },
         )
-    else:
-        print(f"Error: {req.status_code}, {req.text}")
-        return templates.TemplateResponse(
-            request=request,
-            name="error.html",
+
+        if not response.ok:
+            raise Exception(f"Error: {response.json()}")
+
+        temporaryApiKeyData = response.json()
+        return temporaryApiKeyData
+    except Exception as error:
+        print(error)
+        return JSONResponse(
+            status_code=500,
+            content={
+                "error": "Server failed to obtain temporary api key from Soniox Async API."
+            },
         )
 
 
 if __name__ == "__main__":
-    port = int(os.getenv("PORT", 8000))
+    port = int(os.getenv("PORT", 3001))
     uvicorn.run(app, host="0.0.0.0", port=port)

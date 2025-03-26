@@ -18,7 +18,7 @@ ws.addEventListener("open", async () => {
   ws.send(
     JSON.stringify({
       api_key: API_KEY,
-      audio_format: "auto", // let the API detect the format automatically
+      audio_format: "auto", // let the API detect the format
       model: "stt-rt-preview"
     })
   );
