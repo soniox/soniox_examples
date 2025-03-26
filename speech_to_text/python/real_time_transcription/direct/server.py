@@ -32,7 +32,7 @@ async def get_temporary_api_key():
             },
             json={
                 "usage_type": "transcribe_websocket",
-                "expires_in_seconds": 60,  # enough to initialize the WebSocket connection
+                "expires_in_seconds": 60,
             },
         )
 
@@ -45,9 +45,7 @@ async def get_temporary_api_key():
         print(error)
         return JSONResponse(
             status_code=500,
-            content={
-                "error": "Server failed to obtain temporary api key from Soniox Async API."
-            },
+            content={"error": "Server failed to obtain temporary api key."},
         )
 
 

@@ -27,7 +27,7 @@ app.get("/temporary-api-key", async (req, res) => {
         },
         body: JSON.stringify({
           usage_type: "transcribe_websocket",
-          expires_in_seconds: 60 // enough to initialize the WebSocket connection
+          expires_in_seconds: 60,
         })
       }
     );
@@ -41,7 +41,7 @@ app.get("/temporary-api-key", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({
-      error: "Server failed to obtain temporary api key from Soniox Async API."
+      error: "Server failed to obtain temporary api key."
     });
   }
 });
