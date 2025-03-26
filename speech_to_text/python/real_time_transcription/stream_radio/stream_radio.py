@@ -2,18 +2,16 @@ import json
 import os
 import threading
 import time
+import requests
 from websockets import ConnectionClosedOK, ConnectionClosedError
 from websockets.sync.client import connect
 
 WEBSOCKET_URL = "wss://stt-rt.soniox.com/transcribe-websocket"
-FILE_TO_STREAM = "coffee_shop.pcm_s16le"
+RADIO_URL = "https://npr-ice.streamguys1.com/live.mp3?ck=1742897559135"
 
-# Retrieve the API key from environment variable (ensure SONIOX_API_KEY is set)
 API_KEY = os.environ.get("SONIOX_API_KEY")
 if API_KEY is None:
-    raise KeyError(
-        "Your API key is missing. Please set the SONIOX_API_KEY environment variable."
-    )
+    raise KeyError("Missing SONIOX_API_KEY env variable. Please configure it.")
 
 # Connect to WebSocket API
 print("Opening WebSocket connection...")
@@ -23,27 +21,29 @@ with connect(WEBSOCKET_URL) as ws:
         json.dumps(
             {
                 "api_key": API_KEY,
-                "audio_format": "pcm_s16le",
-                "sample_rate": 16000,
-                "num_channels": 1,
+                "audio_format": "auto",  # let the API detect the format automatically
                 "model": "stt-rt-preview",
             }
         )
     )
 
     def send_audio():
-        # Read and send audio data from file over WebSocket connection
-        with open(FILE_TO_STREAM, "rb") as fh:
-            while True:
-                data = fh.read(3840)
-                if len(data) == 0:
-                    break
-                ws.send(data)
-                # Sleep for 120 ms
-                time.sleep(0.12)
+        try:
+            with requests.get(RADIO_URL, stream=True) as response:
+                response.raise_for_status()
 
-        # Signal end of file
-        ws.send("")
+                chunk_size = 4096
+
+                for chunk in response.iter_content(chunk_size=chunk_size):
+                    if chunk:
+                        ws.send(chunk)
+                        time.sleep(0.12)
+
+            # Signal end of file
+            ws.send("")
+
+        except Exception as e:
+            print(f"Error sending audio: {e}")
 
     # Start a thread to send audio
     send_audio_thread = threading.Thread(target=send_audio)
@@ -63,17 +63,21 @@ with connect(WEBSOCKET_URL) as ws:
 
             for token in res.get("tokens", []):
                 if token.get("text"):
-                    # Print out transcribed words
+                    # print out transcribed words
                     print(token["text"], end="", flush=True)
 
             if res.get("finished"):
                 print("\nTranscription done.")
 
     except ConnectionClosedOK:
-        pass
+        print("\nConnection closed normally.")
 
     except ConnectionClosedError as ex:
         print("\nConnection error occurred: ", ex)
 
+    except Exception as e:
+        print(f"\nUnexpected error: {e}")
+
     finally:
         send_audio_thread.join()
+        print("\nTranscription process ended.")
