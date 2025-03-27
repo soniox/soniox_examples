@@ -21,7 +21,7 @@ with connect(WEBSOCKET_URL) as ws:
         json.dumps(
             {
                 "api_key": API_KEY,
-                "audio_format": "auto",  # let the API detect the format automatically
+                "audio_format": "auto",  # let the API detect the format
                 "model": "stt-rt-preview",
             }
         )
@@ -70,7 +70,7 @@ with connect(WEBSOCKET_URL) as ws:
                 print("\nTranscription done.")
 
     except ConnectionClosedOK:
-        print("\nConnection closed normally.")
+        print("\nConnection closed.")
 
     except ConnectionClosedError as ex:
         print("\nConnection error occurred: ", ex)

@@ -78,10 +78,10 @@ ws.addEventListener("message", (event) => {
   }
 });
 
-ws.addEventListener("close", (event) => {
-  console.log(`\nConnection closed with code ${event.code} and reason: ${event.reason}`);
+ws.addEventListener("close", () => {
+  console.log("\nConnection closed.");
 });
 
 ws.addEventListener("error", (error) => {
-  console.error("WebSocket error:", error);
+  console.error("Connection error occurred:", error);
 });
