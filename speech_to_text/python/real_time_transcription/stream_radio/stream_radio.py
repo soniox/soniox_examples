@@ -49,7 +49,7 @@ with connect(WEBSOCKET_URL) as ws:
     send_audio_thread = threading.Thread(target=send_audio)
     send_audio_thread.start()
 
-    print("Transcription started.")
+    print(f"Transcription started from {RADIO_URL}")
 
     # Receive and process text messages
     try:

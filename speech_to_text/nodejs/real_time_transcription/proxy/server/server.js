@@ -9,8 +9,8 @@ const wss = new WebSocket.Server({ server });
 wss.on('connection', (ws) => {
   console.log('Browser client connected');
 
-  // create a message queue to store messages received
-  // before Soniox Real-time API connection is ready, so we don't loose any
+  // create a message queue to store client messages received before
+  // Soniox Real-time API connection is ready, so we don't loose any
   const messageQueue = [];
 
   let sonioxWs = null;
@@ -29,12 +29,12 @@ wss.on('connection', (ws) => {
         model: "stt-rt-preview"
       });
       sonioxWs.send(startMessage);
-      console.log('> Sent start message to Soniox');
+      console.log('Sent start message to Soniox');
 
       // mark connection as ready
       sonioxWsReady = true;
 
-      // Process any queued messages
+      // process any queued messages
       while (messageQueue.length > 0 && sonioxWsReady) {
         const data = messageQueue.shift();
         forwardData(data);
@@ -43,7 +43,8 @@ wss.on('connection', (ws) => {
 
     // receive messages from Soniox STT Real-time API
     sonioxWs.on('message', (data) => {
-      // note: at this point we could manipulate and enhance the transcribed data if needed
+      // note:
+      // at this point we could manipulate and enhance the transcribed data
       try {
         ws.send(data.toString());
       } catch (err) {
