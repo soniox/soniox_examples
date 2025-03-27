@@ -16,6 +16,6 @@ Open new terminal window:
 
 Open new terminal window:
 
-1. Navigate to client folder: `cd frontend`
+1. Navigate to client folder: `cd client`
 2. Start a HTTP server to serve the HTML file: `npx serve` (or use a HTTP server of your choice to serve it)
 3. Open client in browser and click start button, confirm microphone audio permissions and start talking.
