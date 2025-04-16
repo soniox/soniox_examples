@@ -1,8 +1,0 @@
-{
-  "name": "stream_file",
-  "type": "module",
-  "version": "1.0.0",
-  "dependencies": {
-    "node-fetch": "^3.3.2"
-  }
-}

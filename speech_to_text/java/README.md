@@ -1,84 +1,65 @@
 # Java examples
 
+## Download example files
+
+```sh
+# For async transcriptions
+wget https://soniox.com/media/examples/coffee_shop.mp3
+
+# Raw audio for real time transcriptions
+wget https://soniox.com/media/examples/coffee_shop.pcm_s16le
+# You can use ffmpeg to convert your file into PCM format
+# ffmpeg -i coffee_shop.mp3 -f s16le -ar 16000 -ac 1 coffee_shop.pcm_s16le
+```
+
 ## Setup
 
 ```sh
 export SONIOX_API_KEY=<your_soniox_api_key>
 ```
 
-## Run examples
+Async examples require Java 8 or newer, real-time examples require Java 11 or
+newer.
 
-### Transcribe file from URL
+## Async (REST API)
 
-Supports Java 8+.
+### Transcribe a file from URL
 
 ```sh
-cd transcribe_file/remote
+cd async/remote_file
 mvn compile
 mvn exec:java
 ```
 
-or run with Docker
+### Transcribe a local file
 
 ```sh
-cd transcribe_file/remote
-docker run --rm -it \
-    -e SONIOX_API_KEY=$SONIOX_API_KEY \
-    -v `pwd`:/app -w /app \
-    docker.io/eclipse-temurin:8u432-b06-jdk bash -c \
-    'wget -q -P /tmp https://dlcdn.apache.org/maven/maven-3/3.9.9/binaries/apache-maven-3.9.9-bin.tar.gz &&
-    tar -C /tmp -xf /tmp/apache-maven-3.9.9-bin.tar.gz 2>/dev/null; /tmp/apache-maven-3.9.9/bin/mvn -q compile &&
-    /tmp/apache-maven-3.9.9/bin/mvn -q exec:java'
-```
-
-### Transcribe local file
-
-Supports Java 8+.
-
-```sh
-cd transcribe_file/local
-wget https://soniox.com/media/examples/coffee_shop.mp3
+cd async/local_file
 mvn compile
 mvn exec:java
 ```
 
-or run with Docker
+## Real-time (WebSocket API)
+
+### Stream a local file
 
 ```sh
-cd transcribe_file/local
-wget https://soniox.com/media/examples/coffee_shop.mp3
-docker run --rm -it \
-    -e SONIOX_API_KEY=$SONIOX_API_KEY \
-    -v `pwd`:/app -w /app \
-    docker.io/eclipse-temurin:8u432-b06-jdk bash -c \
-    'wget -q -P /tmp https://dlcdn.apache.org/maven/maven-3/3.9.9/binaries/apache-maven-3.9.9-bin.tar.gz &&
-    tar -C /tmp -xf /tmp/apache-maven-3.9.9-bin.tar.gz 2>/dev/null; /tmp/apache-maven-3.9.9/bin/mvn -q compile &&
-    /tmp/apache-maven-3.9.9/bin/mvn -q exec:java'
-```
-
-### Real-time transcription over WebSocket
-
-Supports Java 11+.
-
-```sh
-cd real_time_transcription/realtime
-wget https://soniox.com/media/examples/coffee_shop.pcm_s16le
-# ffmpeg -i coffee_shop.mp3 -f s16le -ar 16000 -ac 1 coffee_shop.pcm_s16le
+cd real_time/stream_file
 mvn compile
 mvn exec:java
 ```
 
-or run with Docker
+## Run with Docker
+
+You can also run the examples with Docker:
 
 ```sh
-cd real_time_transcription/realtime
-wget https://soniox.com/media/examples/coffee_shop.pcm_s16le
-# ffmpeg -i coffee_shop.mp3 -f s16le -ar 16000 -ac 1 coffee_shop.pcm_s16le
 docker run --rm -it \
     -e SONIOX_API_KEY=$SONIOX_API_KEY \
-    -v `pwd`:/app -w /app \
+    -v `pwd`:/examples -w /examples \
     docker.io/eclipse-temurin:11.0.25_9-jdk bash -c \
     'wget -q -P /tmp https://dlcdn.apache.org/maven/maven-3/3.9.9/binaries/apache-maven-3.9.9-bin.tar.gz &&
-    tar -C /tmp -xf /tmp/apache-maven-3.9.9-bin.tar.gz 2>/dev/null; /tmp/apache-maven-3.9.9/bin/mvn -q compile &&
-    /tmp/apache-maven-3.9.9/bin/mvn -q exec:java'
+    tar -C /tmp -xf /tmp/apache-maven-3.9.9-bin.tar.gz 2>/dev/null;
+    export PATH=/tmp/apache-maven-3.9.9/bin:$PATH &&
+    exec bash'
 ```

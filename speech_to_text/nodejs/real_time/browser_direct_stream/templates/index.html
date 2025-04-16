@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+  <h1>Browser direct stream example</h1>
+  <button id="trigger">Start</button>
+  <hr />
+  <div>
+    <span id="final"></span>
+    <span id="nonfinal" style="color: gray"></span>
+  </div>
+  <div id="error"></div>
+  <script type="module">
+    // import Soniox STT Web Library
+    import { RecordTranscribe } from "https://unpkg.com/@soniox/speech-to-text-web?module";
+
+    const finalEl = document.getElementById("final");
+    const nonFinalEl = document.getElementById("nonfinal");
+    const errorEl = document.getElementById("error");
+    const trigger = document.getElementById("trigger");
+
+    let recordTranscribe;
+    let recordTranscribeState = "stopped"; // "stopped" | "starting" | "running" | "stopping"
+
+    async function getTemporaryApiKey() {
+      const response = await fetch('/temporary-api-key');
+      return await response.json();
+    }
+
+    trigger.onclick = async () => {
+      if (recordTranscribeState === "stopped") {
+        finalEl.textContent = "";
+        nonFinalEl.textContent = "";
+        errorEl.textContent = "";
+        trigger.textContent = "Starting...";
+        recordTranscribeState = "starting";
+
+        // obtain a temporary api key from our server
+        const response = await getTemporaryApiKey();
+        const temporaryApiKey = response.api_key;
+
+        if (!temporaryApiKey) {
+          errorEl.textContent += response.error || "Error fetching temp api key.";
+          resetTrigger();
+          return;
+        }
+
+        // create new instance of RecordTranscribe class and authenticate with temp API key
+        recordTranscribe = new RecordTranscribe({
+          apiKey: temporaryApiKey
+        });
+
+        let finalText = "";
+
+        // start transcribing and bind callbacks
+        recordTranscribe.start({
+          model: "stt-rt-preview",
+          languageHints: ["en"],
+          onStarted: () => {
+            // library connected to Soniox STT WebSocket API and is transcribing
+            recordTranscribeState = "running";
+            trigger.textContent = "Stop";
+          },
+          onPartialResult: (result) => {
+            // render the transcript
+            let nonFinalText = "";
+
+            for (let token of result.tokens) {
+              if (token.is_final) {
+                finalText += token.text;
+              } else {
+                nonFinalText += token.text;
+              }
+            }
+
+            finalEl.textContent = finalText;
+            nonFinalEl.textContent = nonFinalText;
+          },
+          onFinished: () => {
+            // transcription finished, we go back to initial state
+            resetTrigger();
+          },
+          onError: (status, message) => {
+            console.log("Error occurred", status, message);
+            errorEl.textContent = message;
+            resetTrigger();
+          },
+        });
+      } else if (recordTranscribeState === "running") {
+        // stop transcribing and wait for final result and connections to close
+        trigger.textContent = "Stopping...";
+        recordTranscribeState = "stopping";
+        recordTranscribe.stop();
+      }
+    };
+
+    function resetTrigger() {
+      trigger.textContent = "Start";
+      recordTranscribeState = "stopped";
+    }
+  </script>
+</body>
+
+</html>

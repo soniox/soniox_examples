@@ -1,6 +1,16 @@
 # C# examples
 
-Examples are tested against .NET 8.0.
+## Download example files
+
+```sh
+# For async transcriptions
+wget https://soniox.com/media/examples/coffee_shop.mp3
+
+# Raw audio for real time transcriptions
+wget https://soniox.com/media/examples/coffee_shop.pcm_s16le
+# You can use ffmpeg to convert your file into PCM format
+# ffmpeg -i coffee_shop.mp3 -f s16le -ar 16000 -ac 1 coffee_shop.pcm_s16le
+```
 
 ## Setup
 
@@ -8,64 +18,38 @@ Examples are tested against .NET 8.0.
 export SONIOX_API_KEY=<your_soniox_api_key>
 ```
 
-## Run examples
+## Async (REST API)
 
-### Transcribe file from URL
+### Transcribe a file from URL
 
 ```sh
-cd transcribe_file/Remote
+cd async/remote_file
 dotnet run
 ```
 
-or run with Docker
+### Transcribe a local file
 
 ```sh
-cd transcribe_file/Remote
-docker run --rm -it \
-    -e SONIOX_API_KEY=$SONIOX_API_KEY \
-    -v `pwd`:/app -w /app \
-    mcr.microsoft.com/dotnet/sdk:8.0 sh -c \
-    'dotnet run'
-```
-
-### Transcribe local file
-
-```sh
-cd transcribe_file/Local
-wget https://soniox.com/media/examples/coffee_shop.mp3
+cd async/local_file
 dotnet run
 ```
 
-or run with Docker
+## Real-time (WebSocket API)
+
+### Stream a local file
 
 ```sh
-cd transcribe_file/Local
-wget https://soniox.com/media/examples/coffee_shop.mp3
-docker run --rm -it \
-    -e SONIOX_API_KEY=$SONIOX_API_KEY \
-    -v `pwd`:/app -w /app \
-    mcr.microsoft.com/dotnet/sdk:8.0 sh -c \
-    'dotnet run'
-```
-
-### Real-time transcription over WebSocket
-
-```sh
-cd real_time_transcription/Realtime
-wget https://soniox.com/media/examples/coffee_shop.pcm_s16le
-# ffmpeg -i coffee_shop.mp3 -f s16le -ar 16000 -ac 1 coffee_shop.pcm_s16le
+cd real_time/stream_file
 dotnet run
 ```
 
-or run with Docker
+## Run with Docker
+
+You can also run the examples with Docker:
 
 ```sh
-cd real_time_transcription/Realtime
-wget https://soniox.com/media/examples/coffee_shop.pcm_s16le
-# ffmpeg -i coffee_shop.mp3 -f s16le -ar 16000 -ac 1 coffee_shop.pcm_s16le
 docker run --rm -it \
     -e SONIOX_API_KEY=$SONIOX_API_KEY \
-    -v `pwd`:/app -w /app \
-    mcr.microsoft.com/dotnet/sdk:8.0 sh -c \
-    'dotnet run'
+    -v `pwd`:/examples -w /examples \
+    mcr.microsoft.com/dotnet/sdk:8.0
 ```

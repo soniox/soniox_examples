@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+  <h1>Browser proxy stream example</h1>
+  <button id="trigger">Start</button>
+  <hr />
+  <div>
+    <span id="final"></span>
+    <span id="nonfinal" style="color: gray"></span>
+  </div>
+  <div id="error"></div>
+  <script>
+    const finalEl = document.getElementById("final");
+    const nonFinalEl = document.getElementById("nonfinal");
+    const errorEl = document.getElementById("error");
+    const trigger = document.getElementById("trigger");
+
+    let ws;
+    let recorder;
+    let recorderState = "stopped"; // "stopped" | "starting" | "running" | "stopping"
+
+    trigger.onclick = async () => {
+      if (recorderState === "stopped") {
+        finalEl.textContent = "";
+        nonFinalEl.textContent = "";
+        errorEl.textContent = "";
+        trigger.textContent = "Starting...";
+        recorderState = "starting";
+
+        // get audio stream from user microphone
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+        // connect to the proxy server
+        ws = new WebSocket("ws://localhost:3001/");
+
+        ws.onopen = () => {
+          recorder = new MediaRecorder(stream);
+
+          recorder.ondataavailable = async (event) => {
+            if (event.data.size > 0) {
+              // convert the recorded audio chunk (Blob) to raw binary (ArrayBuffer)
+              // and send via websocket message
+              ws.send(await event.data.arrayBuffer());
+            }
+          };
+
+          recorder.onstop = () => {
+            // send empty string message to tell the Soniox WebSocket API to stop
+            ws.send("");
+          };
+
+          // start recording, creating data chunks every 120ms
+          recorder.start(120);
+
+          recorderState = "running";
+          trigger.textContent = "Stop";
+        };
+
+        let finalText = "";
+
+        ws.onmessage = (event) => {
+          // parse messages received from Node.js server
+          const result = JSON.parse(event.data);
+
+          if (result.error_message) {
+            errorEl.textContent = `${result.error_message}`;
+            return;
+          }
+
+          // render the transcript
+          let nonFinalText = "";
+
+          for (let token of result.tokens) {
+            if (token.is_final) {
+              finalText += token.text;
+            } else {
+              nonFinalText += token.text;
+            }
+          }
+
+          finalEl.textContent = finalText;
+          nonFinalEl.textContent = nonFinalText;
+        };
+
+        ws.onerror = (error) => {
+          console.error("WebSocket error:", error);
+          errorEl.textContent = `${message}`;
+          stopRecording();
+        };
+
+        ws.onclose = (event) => {
+          console.log("WebSocket connection closed", event.code);
+          stopRecording();
+        };
+      } else if (recorderState === "running") {
+        stopRecording();
+      }
+    };
+
+    function stopRecording() {
+      if (recorder) {
+        // stop microphone recording properly
+        recorder.stop();
+        recorder.stream.getTracks().forEach((t) => t.stop());
+      }
+      trigger.textContent = "Start";
+      recorderState = "stopped";
+    }
+  </script>
+</body>
+
+</html>
