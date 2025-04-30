@@ -49,6 +49,10 @@ def main():
     print("Transcript:")
     print(res.json()["text"])
 
+    # Delete the transcription
+    res = session.delete(f"{api_base}/v1/transcriptions/{transcription_id}")
+    res.raise_for_status()
+
 
 if __name__ == "__main__":
     main()

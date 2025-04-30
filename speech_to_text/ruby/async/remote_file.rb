@@ -20,7 +20,7 @@ def poll_until_complete(http, api_base, headers, transcription_id)
     res = http.start(uri.hostname, uri.port, use_ssl: true) do |http|
       http.request(req)
     end
-    raise "Transcription status check failed: #{res.body}" unless res.is_a?(Net::HTTPSuccess)
+    raise "Failed to get transcription: #{res.body}" unless res.is_a?(Net::HTTPSuccess)
     transcription = JSON.parse(res.body)
     case transcription["status"]
     when "completed"
@@ -46,18 +46,27 @@ req["Content-Type"] = "application/json"
 res = http.start(uri.hostname, uri.port, use_ssl: true) do |http|
   http.request(req)
 end
-raise "Transcription request failed: #{res.body}" unless res.is_a?(Net::HTTPSuccess)
+raise "Failed to create transcription: #{res.body}" unless res.is_a?(Net::HTTPSuccess)
 transcription_id = JSON.parse(res.body)["id"]
 puts "Transcription ID: #{transcription_id}"
 
 poll_until_complete(http, api_base, headers, transcription_id)
 
+# Get the transcript text
 uri = URI("#{api_base}/v1/transcriptions/#{transcription_id}/transcript")
 req = Net::HTTP::Get.new(uri, headers)
 res = http.start(uri.hostname, uri.port, use_ssl: true) do |http|
   http.request(req)
 end
-raise "Transcript fetch failed: #{res.body}" unless res.is_a?(Net::HTTPSuccess)
+raise "Failed to get transcript: #{res.body}" unless res.is_a?(Net::HTTPSuccess)
 transcript = JSON.parse(res.body)
 puts "Transcript:"
 puts "#{transcript["text"]}"
+
+# Delete the transcription
+uri = URI("#{api_base}/v1/transcriptions/#{transcription_id}")
+req = Net::HTTP::Delete.new(uri, headers)
+res = http.start(uri.hostname, uri.port, use_ssl: true) do |http|
+  http.request(req)
+end
+raise "Failed to delete transcription: #{res.body}" unless res.is_a?(Net::HTTPSuccess)

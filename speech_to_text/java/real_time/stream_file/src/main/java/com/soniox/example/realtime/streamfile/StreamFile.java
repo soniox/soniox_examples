@@ -15,7 +15,7 @@ public class StreamFile {
         String apiKey = System.getenv("SONIOX_API_KEY");
         URI websocketUrl = URI.create("wss://stt-rt.soniox.com/transcribe-websocket");
         String fileToTranscribe = "../../coffee_shop.pcm_s16le";
-        
+
         ExecutorService executor = Executors.newCachedThreadPool();
         HttpClient client = HttpClient.newBuilder().executor(executor).build();
 

@@ -34,6 +34,7 @@ int poll_until_complete(const char *auth_header, const char *api_base, const cha
         headers = curl_slist_append(headers, auth_header);
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
+        res = NULL;
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &res);
         res_code = curl_easy_perform(curl);
         curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_status);
@@ -98,6 +99,7 @@ int main() {
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(curl, CURLOPT_MIMEPOST, form);  // Use CURLOPT_MIMEPOST
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
+    res = NULL;
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &res);
     res_code = curl_easy_perform(curl);
     curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_status);
@@ -117,7 +119,7 @@ int main() {
     free(res);
 
     printf("Starting transcription...\n");
-    
+
     struct json_object *create_transcription_data = json_object_new_object();
     json_object_object_add(create_transcription_data, "file_id", json_object_new_string(file_id));
     json_object_object_add(create_transcription_data, "model", json_object_new_string("stt-async-preview"));
@@ -125,7 +127,7 @@ int main() {
     json_object_array_add(language_hints_array, json_object_new_string("en"));
     json_object_array_add(language_hints_array, json_object_new_string("es"));
     json_object_object_add(create_transcription_data, "language_hints", language_hints_array);
-    
+
     curl = curl_easy_init();
     if (!curl) {
         fprintf(stderr, "Failed to initialize CURL\n");
@@ -139,6 +141,7 @@ int main() {
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_object_to_json_string(create_transcription_data));
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
+    res = NULL;
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &res);
     res_code = curl_easy_perform(curl);
     curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_status);
@@ -154,7 +157,7 @@ int main() {
     curl_easy_cleanup(curl);
     curl_slist_free_all(headers);
     free(res);
-    
+
     printf("Transcription ID: %s\n", transcription_id);
 
     int code;
@@ -163,7 +166,7 @@ int main() {
     }
 
     // Get the transcript text
-    
+
     curl = curl_easy_init();
     if (!curl) {
         fprintf(stderr, "Failed to initialize CURL\n");
@@ -175,6 +178,7 @@ int main() {
     headers = curl_slist_append(headers, auth_header);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
+    res = NULL;
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &res);
     res_code = curl_easy_perform(curl);
     curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_status);
@@ -187,12 +191,74 @@ int main() {
     }
     struct json_object *transcript_json = json_tokener_parse(res);
     const char *transcript_text = json_object_get_string(json_object_object_get(transcript_json, "text"));
-    
+
     printf("Transcript:\n%s\n", transcript_text);
-    
+
     curl_easy_cleanup(curl);
     curl_slist_free_all(headers);
     free(res);
+
+    // Delete the transcription
+
+    curl = curl_easy_init();
+    if (!curl) {
+        fprintf(stderr, "Failed to initialize CURL\n");
+        return 1;
+    }
+    snprintf(url, sizeof(url), "%s/v1/transcriptions/%s", api_base, transcription_id);
+    curl_easy_setopt(curl, CURLOPT_URL, url);
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE");
+    headers = NULL;
+    headers = curl_slist_append(headers, auth_header);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
+    res = NULL;
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &res);
+    res_code = curl_easy_perform(curl);
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_status);
+    if (res_code != CURLE_OK || http_status != 204) {
+        fprintf(stderr, "Failed to delete transcription: %s\n", res ? res : curl_easy_strerror(res_code));
+        curl_easy_cleanup(curl);
+        curl_slist_free_all(headers);
+        free(res);
+        return 1;
+    }
+    curl_easy_cleanup(curl);
+    curl_slist_free_all(headers);
+    if (res) {
+        free(res);
+    }
+
+    // Delete the file
+
+    curl = curl_easy_init();
+    if (!curl) {
+        fprintf(stderr, "Failed to initialize CURL\n");
+        return 1;
+    }
+    snprintf(url, sizeof(url), "%s/v1/files/%s", api_base, file_id);
+    curl_easy_setopt(curl, CURLOPT_URL, url);
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE");
+    headers = NULL;
+    headers = curl_slist_append(headers, auth_header);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
+    res = NULL;
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &res);
+    res_code = curl_easy_perform(curl);
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_status);
+    if (res_code != CURLE_OK || http_status != 204) {
+        fprintf(stderr, "Failed to delete file: %s\n", res ? res : curl_easy_strerror(res_code));
+        curl_easy_cleanup(curl);
+        curl_slist_free_all(headers);
+        free(res);
+        return 1;
+    }
+    curl_easy_cleanup(curl);
+    curl_slist_free_all(headers);
+    if (res) {
+        free(res);
+    }
 
     return 0;
 }

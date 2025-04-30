@@ -134,4 +134,34 @@ func main() {
 		panic(err)
 	}
 	fmt.Printf("Transcript:\n%s\n", transcriptResponse["text"].(string))
+
+	// Delete the transcription
+	req, err = http.NewRequest("DELETE", fmt.Sprintf("%s/v1/transcriptions/%s", apiBase, transcriptionId), nil)
+	if err != nil {
+		panic(err)
+	}
+	req.Header.Set("Authorization", "Bearer "+apiKey)
+	res, err = http.DefaultClient.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer res.Body.Close()
+	if res.StatusCode != http.StatusNoContent {
+		panic(res.Status)
+	}
+
+	// Delete the file
+	req, err = http.NewRequest("DELETE", fmt.Sprintf("%s/v1/files/%s", apiBase, fileId), nil)
+	if err != nil {
+		panic(err)
+	}
+	req.Header.Set("Authorization", "Bearer "+apiKey)
+	res, err = http.DefaultClient.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer res.Body.Close()
+	if res.StatusCode != http.StatusNoContent {
+		panic(res.Status)
+	}
 }

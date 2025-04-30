@@ -30,7 +30,7 @@ function poll_until_complete {
   done
 }
 
-if ! command -v curl &> /dev/null || ! command -v jq &> /dev/null; then
+if ! command -v curl &>/dev/null || ! command -v jq &>/dev/null; then
   echo "Error: curl and jq are required. Please install them and try again."
   exit 1
 fi
@@ -78,17 +78,22 @@ poll_until_complete $transcription_id
 # Get the transcript text
 res=$(curl -s -X GET "$api_base/v1/transcriptions/$transcription_id/transcript" \
   -H "Authorization: Bearer $api_key")
-
 if [[ ! -z "$(echo "$res" | jq -r '.error_type // empty')" ]]; then
   echo "Error retrieving transcript: $res"
   exit 1
 fi
-
 transcript_text=$(echo "$res" | jq -r '.text')
 if [[ -z "$transcript_text" || "$transcript_text" == "null" ]]; then
   echo "Error retrieving transcript: $res"
   exit 1
 fi
-
 echo "Transcript:"
 echo $transcript_text
+
+# Delete the transcription
+curl -f -X DELETE "$api_base/v1/transcriptions/$transcription_id" \
+  -H "Authorization: Bearer $api_key"
+
+# Delete the file
+curl -f -X DELETE "$api_base/v1/files/$file_id" \
+  -H "Authorization: Bearer $api_key"

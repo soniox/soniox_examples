@@ -21,10 +21,10 @@ client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bear
 async Task pollUntilComplete(string transcriptionId) {
     while (true)
     {
-        var response = await client.GetAsync($"{apiBase}/v1/transcriptions/{transcriptionId}");
-        response.EnsureSuccessStatusCode();
-        var responseJson = await response.Content.ReadAsStringAsync();
-        var transcription = JsonNode.Parse(responseJson);
+        var res = await client.GetAsync($"{apiBase}/v1/transcriptions/{transcriptionId}");
+        res.EnsureSuccessStatusCode();
+        var resJson = await res.Content.ReadAsStringAsync();
+        var transcription = JsonNode.Parse(resJson);
         var status = transcription?["status"]?.ToString();
         if (string.IsNullOrEmpty(status))
         {
@@ -48,10 +48,10 @@ Console.WriteLine("Starting file upload...");
 using var fileStream = new FileStream(fileToTranscribe, FileMode.Open, FileAccess.Read);
 var fileContent = new MultipartFormDataContent();
 fileContent.Add(new StreamContent(fileStream), "file", Path.GetFileName(fileToTranscribe));
-var response = await client.PostAsync($"{apiBase}/v1/files", fileContent);
-response.EnsureSuccessStatusCode();
-var responseJson = await response.Content.ReadAsStringAsync();
-var file = JsonNode.Parse(responseJson);
+var res = await client.PostAsync($"{apiBase}/v1/files", fileContent);
+res.EnsureSuccessStatusCode();
+var resJson = await res.Content.ReadAsStringAsync();
+var file = JsonNode.Parse(resJson);
 var fileId = file?["id"]?.ToString();
 if (string.IsNullOrEmpty(fileId))
 {
@@ -69,10 +69,10 @@ var request = new StringContent(
     System.Text.Encoding.UTF8,
     "application/json"
 );
-response = await client.PostAsync($"{apiBase}/v1/transcriptions", request);
-response.EnsureSuccessStatusCode();
-responseJson = await response.Content.ReadAsStringAsync();
-var transcription = JsonNode.Parse(responseJson);
+res = await client.PostAsync($"{apiBase}/v1/transcriptions", request);
+res.EnsureSuccessStatusCode();
+resJson = await res.Content.ReadAsStringAsync();
+var transcription = JsonNode.Parse(resJson);
 var transcriptionId = transcription?["id"]?.ToString();
 if (string.IsNullOrEmpty(transcriptionId))
 {
@@ -84,10 +84,10 @@ Console.WriteLine($"Transcription ID: {transcriptionId}");
 await pollUntilComplete(transcriptionId);
 
 // Get the transcript text
-response = await client.GetAsync($"{apiBase}/v1/transcriptions/{transcriptionId}/transcript");
-response.EnsureSuccessStatusCode();
-responseJson = await response.Content.ReadAsStringAsync();
-var transcript = JsonNode.Parse(responseJson);
+res = await client.GetAsync($"{apiBase}/v1/transcriptions/{transcriptionId}/transcript");
+res.EnsureSuccessStatusCode();
+resJson = await res.Content.ReadAsStringAsync();
+var transcript = JsonNode.Parse(resJson);
 var transcriptText = transcript?["text"]?.ToString();
 if (string.IsNullOrEmpty(transcriptText))
 {
@@ -95,3 +95,11 @@ if (string.IsNullOrEmpty(transcriptText))
 }
 Console.WriteLine("Transcript:");
 Console.WriteLine(transcriptText);
+
+// Delete the transcription
+res = await client.DeleteAsync($"{apiBase}/v1/transcriptions/{transcriptionId}");
+res.EnsureSuccessStatusCode();
+
+// Delete the file
+res = await client.DeleteAsync($"{apiBase}/v1/files/{fileId}");
+res.EnsureSuccessStatusCode();

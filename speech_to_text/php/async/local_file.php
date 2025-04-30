@@ -29,19 +29,19 @@ function poll_until_complete($api_base, $auth_header, $transcription_id) {
         $res = curl_exec($session);
         $http_status = curl_getinfo($session, CURLINFO_HTTP_CODE);
         curl_close($session);
-    
+
         if ($http_status !== 200) {
             die("Failed to get transcription: $res");
         }
-    
+
         $transcription = json_decode($res, true);
-    
+
         if ($transcription["status"] === "error") {
             die("Transcription error: {$transcription["error_message"]}");
         } else if ($transcription["status"] === "completed") {
             break;
         }
-    
+
         // Wait for 1 second before polling again
         sleep(1);
     }
@@ -98,5 +98,25 @@ if ($http_status !== 200) {
 }
 $transcript = json_decode($res, true);
 echo "Transcript:\n" . $transcript["text"] . "\n";
+
+// Delete the transcription
+$session = create_curl_session("$api_base/v1/transcriptions/{$transcription_id}", $auth_header);
+curl_setopt($session, CURLOPT_CUSTOMREQUEST, "DELETE");
+$res = curl_exec($session);
+$http_status = curl_getinfo($session, CURLINFO_HTTP_CODE);
+curl_close($session);
+if ($http_status !== 204) {
+    die("Failed to delete transcription: $res");
+}
+
+// Delete the file
+$session = create_curl_session("$api_base/v1/files/{$file_id}", $auth_header);
+curl_setopt($session, CURLOPT_CUSTOMREQUEST, "DELETE");
+$res = curl_exec($session);
+$http_status = curl_getinfo($session, CURLINFO_HTTP_CODE);
+curl_close($session);
+if ($http_status !== 204) {
+    die("Failed to delete file: $res");
+}
 
 ?>

@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
@@ -88,6 +89,24 @@ public class LocalFile {
             JSONObject transcript = new JSONObject(EntityUtils.toString(res.getEntity()));
             System.out.println("Transcript:");
             System.out.println(transcript.getString("text"));
+
+            // Delete the transcription
+            HttpDelete deleteReq = new HttpDelete(apiBase + "/v1/transcriptions/" + transcription.getString("id"));
+            deleteReq.setHeader("Authorization", "Bearer " + apiKey);
+            res = client.execute(deleteReq);
+            if (res.getStatusLine().getStatusCode() != 204) {
+                throw new RuntimeException("Failed to delete transcription: " +
+                        EntityUtils.toString(res.getEntity()));
+            }
+
+            // Delete the file
+            deleteReq = new HttpDelete(apiBase + "/v1/files/" + file.getString("id"));
+            deleteReq.setHeader("Authorization", "Bearer " + apiKey);
+            res = client.execute(deleteReq);
+            if (res.getStatusLine().getStatusCode() != 204) {
+                throw new RuntimeException("Failed to delete file: " +
+                        EntityUtils.toString(res.getEntity()));
+            }
         }
     }
 }

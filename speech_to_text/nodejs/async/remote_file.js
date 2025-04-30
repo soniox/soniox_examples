@@ -66,3 +66,14 @@ if (!res.ok) {
 const transcript = await res.json();
 console.log("Transcript:");
 console.log(transcript.text);
+
+// Delete the transcription
+res = await fetch(`${apiBase}/v1/transcriptions/${transcription.id}`, {
+  method: "DELETE",
+  headers: {
+    Authorization: `Bearer ${apiKey}`,
+  },
+});
+if (!res.ok) {
+  throw new Error(`Failed to delete transcription: ${res.statusText}`);
+}

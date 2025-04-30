@@ -26,6 +26,9 @@ def main():
     )
     res.raise_for_status()
 
+    # When you receive the Webhook, get the transcript and delete the
+    # transcription.
+
 
 if __name__ == "__main__":
     main()
