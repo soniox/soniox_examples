@@ -23,28 +23,6 @@ def stream_audio(ws):
     ws.send("")  # signal end of stream
 
 
-def render_tokens(final_tokens, non_final_tokens):
-    # Render the tokens in the terminal using ANSI escape codes.
-    text = ""
-    text += "\033[2J\033[H"  # clear the screen, move to top-left corner
-    is_final = True
-    speaker = ""
-    for token in final_tokens + non_final_tokens:
-        token_text = token["text"]
-        if not token["is_final"] and is_final:
-            text += "\033[34m"  # change text color to blue
-            is_final = False
-        if token.get("speaker") and token["speaker"] != speaker:
-            if speaker:
-                text += "\n"
-            speaker = token["speaker"]
-            text += f"Speaker {speaker}: "
-            token_text = token_text.lstrip()
-        text += token_text
-    text += "\033[39m"  # reset text color
-    print(text)
-
-
 def main():
     print("Opening WebSocket connection...")
 
@@ -59,7 +37,8 @@ def main():
                     "num_channels": 1,
                     "model": "stt-rt-preview",
                     "language_hints": ["en", "es"],
-                    "enable_speaker_diarization": True,
+                    "enable_non_final_tokens": False,
+                    "enable_endpoint_detection": True,
                 }
             )
         )
@@ -69,7 +48,7 @@ def main():
 
         print("Transcription started")
 
-        final_tokens = []
+        current_text = ""
 
         try:
             while True:
@@ -80,18 +59,20 @@ def main():
                     print(f"Error: {res['error_code']} - {res['error_message']}")
                     break
 
-                non_final_tokens = []
-
                 for token in res.get("tokens", []):
                     if token.get("text"):
-                        if token.get("is_final"):
-                            final_tokens.append(token)
+                        if token["text"] == "<end>":
+                            print(current_text)
+                            current_text = ""
+                        elif not current_text:
+                            current_text = token["text"].lstrip()
                         else:
-                            non_final_tokens.append(token)
-
-                render_tokens(final_tokens, non_final_tokens)
+                            current_text += token["text"]
 
                 if res.get("finished"):
+                    if current_text:
+                        print(current_text)
+
                     print("\nTranscription complete.")
         except ConnectionClosedOK:
             pass

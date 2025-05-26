@@ -22,6 +22,11 @@ wget https://soniox.com/media/examples/coffee_shop.mp3
 wget https://soniox.com/media/examples/coffee_shop.pcm_s16le
 # You can use ffmpeg to convert your file into PCM format
 # ffmpeg -i coffee_shop.mp3 -f s16le -ar 16000 -ac 1 coffee_shop.pcm_s16le
+
+# Raw audio for real time translations
+wget https://soniox.com/media/examples/two_way_translation.pcm_s16le
+# You can use ffmpeg to convert your file into PCM format
+# ffmpeg -i two_way_translation.mp3 -f s16le -ar 16000 -ac 1 two_way_translation.pcm_s16le
 ```
 
 ## Async (REST API)

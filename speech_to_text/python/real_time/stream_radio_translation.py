@@ -1,25 +1,23 @@
 import json
 import os
 import threading
-import time
 
+import requests
 from websockets import ConnectionClosedOK
 from websockets.sync.client import connect
 
 # Retrieve the API key from environment variable (ensure SONIOX_API_KEY is set)
 api_key = os.environ.get("SONIOX_API_KEY")
 websocket_url = "wss://stt-rt.soniox.com/transcribe-websocket"
-file_to_transcribe = "coffee_shop.pcm_s16le"
+audio_url = "https://npr-ice.streamguys1.com/live.mp3?ck=1742897559135"
 
 
 def stream_audio(ws):
-    with open(file_to_transcribe, "rb") as fh:
-        while True:
-            data = fh.read(3840)
-            if len(data) == 0:
-                break
-            ws.send(data)
-            time.sleep(0.12)  # sleep for 120 ms
+    with requests.get(audio_url, stream=True) as res:
+        res.raise_for_status()
+        for chunk in res.iter_content(chunk_size=4096):
+            if chunk:
+                ws.send(chunk)
     ws.send("")  # signal end of stream
 
 
@@ -29,6 +27,7 @@ def render_tokens(final_tokens, non_final_tokens):
     text += "\033[2J\033[H"  # clear the screen, move to top-left corner
     is_final = True
     speaker = ""
+    language = ""
     for token in final_tokens + non_final_tokens:
         token_text = token["text"]
         if not token["is_final"] and is_final:
@@ -36,9 +35,15 @@ def render_tokens(final_tokens, non_final_tokens):
             is_final = False
         if token.get("speaker") and token["speaker"] != speaker:
             if speaker:
-                text += "\n"
+                text += "\n\n"
             speaker = token["speaker"]
             text += f"Speaker {speaker}: "
+            token_text = token_text.lstrip()
+            language = ""
+        if token.get("language") and token["language"] != language:
+            text += "\n"
+            language = token["language"]
+            text += f"[{language}] "
             token_text = token_text.lstrip()
         text += token_text
     text += "\033[39m"  # reset text color
@@ -54,12 +59,14 @@ def main():
             json.dumps(
                 {
                     "api_key": api_key,
-                    "audio_format": "pcm_s16le",
-                    "sample_rate": 16000,
-                    "num_channels": 1,
+                    "audio_format": "auto",  # let the API detect the format
                     "model": "stt-rt-preview",
                     "language_hints": ["en", "es"],
                     "enable_speaker_diarization": True,
+                    "translation": {
+                        "target_language": "es",
+                        "source_languages": ["en"],
+                    },
                 }
             )
         )
@@ -67,7 +74,7 @@ def main():
         # Start streaming audio in background
         threading.Thread(target=stream_audio, args=(ws,), daemon=True).start()
 
-        print("Transcription started")
+        print(f"Transcription started from {audio_url}")
 
         final_tokens = []
 

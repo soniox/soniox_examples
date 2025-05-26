@@ -3,6 +3,7 @@ import os
 import threading
 import time
 
+import requests
 from websockets import ConnectionClosedOK
 from websockets.sync.client import connect
 
@@ -14,35 +15,23 @@ file_to_transcribe = "coffee_shop.pcm_s16le"
 
 def stream_audio(ws):
     with open(file_to_transcribe, "rb") as fh:
+        start = time.monotonic()
+        finalized = False
         while True:
+            if time.monotonic() - start > 6 and not finalized:
+                # Finalize current audio.
+                ws.send('{"type": "finalize"}')
+                finalized = True
+                # Wait for 30 seconds but send keepalive every 10 seconds.
+                for _ in range(3):
+                    time.sleep(10)
+                    ws.send('{"type": "keepalive"}')
             data = fh.read(3840)
             if len(data) == 0:
                 break
             ws.send(data)
             time.sleep(0.12)  # sleep for 120 ms
     ws.send("")  # signal end of stream
-
-
-def render_tokens(final_tokens, non_final_tokens):
-    # Render the tokens in the terminal using ANSI escape codes.
-    text = ""
-    text += "\033[2J\033[H"  # clear the screen, move to top-left corner
-    is_final = True
-    speaker = ""
-    for token in final_tokens + non_final_tokens:
-        token_text = token["text"]
-        if not token["is_final"] and is_final:
-            text += "\033[34m"  # change text color to blue
-            is_final = False
-        if token.get("speaker") and token["speaker"] != speaker:
-            if speaker:
-                text += "\n"
-            speaker = token["speaker"]
-            text += f"Speaker {speaker}: "
-            token_text = token_text.lstrip()
-        text += token_text
-    text += "\033[39m"  # reset text color
-    print(text)
 
 
 def main():
@@ -59,7 +48,6 @@ def main():
                     "num_channels": 1,
                     "model": "stt-rt-preview",
                     "language_hints": ["en", "es"],
-                    "enable_speaker_diarization": True,
                 }
             )
         )
@@ -69,7 +57,7 @@ def main():
 
         print("Transcription started")
 
-        final_tokens = []
+        final_text = ""
 
         try:
             while True:
@@ -80,16 +68,22 @@ def main():
                     print(f"Error: {res['error_code']} - {res['error_message']}")
                     break
 
-                non_final_tokens = []
+                non_final_text = ""
 
                 for token in res.get("tokens", []):
                     if token.get("text"):
                         if token.get("is_final"):
-                            final_tokens.append(token)
+                            final_text += token["text"]
                         else:
-                            non_final_tokens.append(token)
+                            non_final_text += token["text"]
 
-                render_tokens(final_tokens, non_final_tokens)
+                print(
+                    "\033[2J\033[H"  # clear the screen, move to top-left corner
+                    + final_text  # write final text
+                    + "\033[34m"  # change text color to blue
+                    + non_final_text  # write non-final text
+                    + "\033[39m"  # reset text color
+                )
 
                 if res.get("finished"):
                     print("\nTranscription complete.")

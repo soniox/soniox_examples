@@ -9,7 +9,7 @@ from websockets.sync.client import connect
 # Retrieve the API key from environment variable (ensure SONIOX_API_KEY is set)
 api_key = os.environ.get("SONIOX_API_KEY")
 websocket_url = "wss://stt-rt.soniox.com/transcribe-websocket"
-file_to_transcribe = "coffee_shop.pcm_s16le"
+file_to_transcribe = "two_way_translation.pcm_s16le"
 
 
 def stream_audio(ws):
@@ -29,6 +29,7 @@ def render_tokens(final_tokens, non_final_tokens):
     text += "\033[2J\033[H"  # clear the screen, move to top-left corner
     is_final = True
     speaker = ""
+    language = ""
     for token in final_tokens + non_final_tokens:
         token_text = token["text"]
         if not token["is_final"] and is_final:
@@ -36,9 +37,15 @@ def render_tokens(final_tokens, non_final_tokens):
             is_final = False
         if token.get("speaker") and token["speaker"] != speaker:
             if speaker:
-                text += "\n"
+                text += "\n\n"
             speaker = token["speaker"]
             text += f"Speaker {speaker}: "
+            token_text = token_text.lstrip()
+            language = ""
+        if token.get("language") and token["language"] != language:
+            text += "\n"
+            language = token["language"]
+            text += f"[{language}] "
             token_text = token_text.lstrip()
         text += token_text
     text += "\033[39m"  # reset text color
@@ -60,6 +67,11 @@ def main():
                     "model": "stt-rt-preview",
                     "language_hints": ["en", "es"],
                     "enable_speaker_diarization": True,
+                    "translation": {
+                        "target_language": "en",
+                        "source_languages": ["*"],
+                        "two_way_target_language": "es",
+                    },
                 }
             )
         )
