@@ -64,6 +64,7 @@ def main():
                     "language_hints": ["en", "es"],
                     "enable_speaker_diarization": True,
                     "translation": {
+                        "type": "one_way",
                         "target_language": "es",
                         "source_languages": ["en"],
                     },

@@ -1,4 +1,3 @@
-import { createReadStream } from "fs";
 import fetch from "node-fetch";
 
 // Retrieve the API key from environment variable (ensure SONIOX_API_KEY is set)
@@ -20,9 +19,9 @@ ws.addEventListener("open", async () => {
       language_hints: ["en", "es"],
       enable_speaker_diarization: true,
       translation: {
-        target_language: "en",
-        source_languages: ["*"],
-        two_way_target_language: "es",
+        type: "one_way",
+        target_language: "es",
+        source_languages: ["en"],
       },
     })
   );

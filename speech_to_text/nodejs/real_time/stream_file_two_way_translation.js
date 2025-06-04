@@ -21,9 +21,9 @@ ws.addEventListener("open", async () => {
       language_hints: ["en", "es"],
       enable_speaker_diarization: true,
       translation: {
-        target_language: "en",
-        source_languages: ["*"],
-        two_way_target_language: "es",
+        type: "two_way",
+        language_a: "en",
+        language_b: "es",
       },
     })
   );
