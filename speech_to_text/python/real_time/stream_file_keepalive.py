@@ -14,6 +14,13 @@ file_to_transcribe = "coffee_shop.pcm_s16le"
 
 
 def stream_audio(ws):
+    # Wait for 20 seconds before sending audio but send keepalive every 5
+    # seconds.
+    for _ in range(4):
+        time.sleep(5)
+        print("Keepalive")
+        ws.send('{"type": "keepalive"}')
+
     with open(file_to_transcribe, "rb") as fh:
         start = time.monotonic()
         finalized = False
@@ -22,9 +29,10 @@ def stream_audio(ws):
                 # Finalize current audio.
                 ws.send('{"type": "finalize"}')
                 finalized = True
-                # Wait for 30 seconds but send keepalive every 10 seconds.
-                for _ in range(3):
-                    time.sleep(10)
+                # Wait for 30 seconds but send keepalive every 5 seconds.
+                for _ in range(6):
+                    time.sleep(5)
+                    print("Keepalive")
                     ws.send('{"type": "keepalive"}')
             data = fh.read(3840)
             if len(data) == 0:
