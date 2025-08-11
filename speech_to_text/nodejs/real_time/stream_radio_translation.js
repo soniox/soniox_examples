@@ -15,13 +15,12 @@ ws.addEventListener("open", async () => {
     JSON.stringify({
       api_key: apiKey,
       audio_format: "auto", // server detects the format
-      model: "stt-rt-preview",
+      model: "stt-rt-preview-v2",
       language_hints: ["en", "es"],
       enable_speaker_diarization: true,
       translation: {
         type: "one_way",
         target_language: "es",
-        source_languages: ["en"],
       },
     })
   );

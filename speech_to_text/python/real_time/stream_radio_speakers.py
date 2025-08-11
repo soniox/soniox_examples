@@ -53,7 +53,7 @@ def main():
                 {
                     "api_key": api_key,
                     "audio_format": "auto",  # let the API detect the format
-                    "model": "stt-rt-preview",
+                    "model": "stt-rt-preview-v2",
                     "language_hints": ["en", "es"],
                     "enable_speaker_diarization": True,
                 }

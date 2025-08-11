@@ -36,7 +36,7 @@ public class StreamFile {
                 startRequest.put("audio_format", "pcm_s16le");
                 startRequest.put("sample_rate", 16000);
                 startRequest.put("num_channels", 1);
-                startRequest.put("model", "stt-rt-preview");
+                startRequest.put("model", "stt-rt-preview-v2");
                 startRequest.put("language_hints", new String[]{"en", "es"});
 
                 webSocket.sendText(startRequest.toString(), true);

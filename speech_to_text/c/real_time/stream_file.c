@@ -111,7 +111,7 @@ int callback(struct lws *wsi, enum lws_callback_reasons reason,
                 json_object_object_add(start_req, "audio_format", json_object_new_string("pcm_s16le"));
                 json_object_object_add(start_req, "sample_rate", json_object_new_int(16000));
                 json_object_object_add(start_req, "num_channels", json_object_new_int(1));
-                json_object_object_add(start_req, "model", json_object_new_string("stt-rt-preview"));
+                json_object_object_add(start_req, "model", json_object_new_string("stt-rt-preview-v2"));
                 json_object *language_hints_array = json_object_new_array();
                 json_object_array_add(language_hints_array, json_object_new_string("en"));
                 json_object_array_add(language_hints_array, json_object_new_string("es"));

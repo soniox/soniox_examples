@@ -23,7 +23,7 @@ mkfifo -m 0600 "${input_fifo}"
 audio_format="pcm_s16le"
 sample_rate=16000
 num_channels=1
-model="stt-rt-preview"
+model="stt-rt-preview-v2"
 language_hints='["en", "es"]'
 # corresponds to 120ms at 16kHz mono 16-bit little-endian PCM
 chunk_size=3840

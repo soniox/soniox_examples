@@ -17,7 +17,7 @@ ws.addEventListener("open", async () => {
       audio_format: "pcm_s16le",
       sample_rate: 16000,
       num_channels: 1,
-      model: "stt-rt-preview",
+      model: "stt-rt-preview-v2",
       language_hints: ["en", "es"],
       enable_speaker_diarization: true,
     })

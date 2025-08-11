@@ -26,7 +26,7 @@ wss.on("connection", (ws) => {
       const startMessage = JSON.stringify({
         api_key: process.env.SONIOX_API_KEY,
         audio_format: "auto",
-        model: "stt-rt-preview",
+        model: "stt-rt-preview-v2",
         language_hints: ["en"],
       });
       sonioxWs.send(startMessage);

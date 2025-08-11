@@ -31,7 +31,7 @@ async def handle_client(websocket):
                 {
                     "api_key": os.getenv("SONIOX_API_KEY"),
                     "audio_format": "auto",
-                    "model": "stt-rt-preview",
+                    "model": "stt-rt-preview-v2",
                     "language_hints": ["en"],
                 }
             )

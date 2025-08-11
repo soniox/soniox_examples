@@ -60,7 +60,7 @@ func main() {
 		AudioFormat:   "pcm_s16le",
 		SampleRate:    16000,
 		NumChannels:   1,
-		Model:         "stt-rt-preview",
+		Model:         "stt-rt-preview-v2",
 		LanguageHints: []string{"en", "es"},
 	})
 	if err != nil {
