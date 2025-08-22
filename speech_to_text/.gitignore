@@ -9,7 +9,4 @@ vendor/
 target/
 composer-setup.php
 composer.phar
-
-*.mp3
-*.pcm_s16le
 .env
