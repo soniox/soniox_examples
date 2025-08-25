@@ -40,7 +40,7 @@ Run the ready-to-use examples below.
 <summary><b>Python</b></summary>
 
 ```sh
-# Set up environment:
+# Set up environment
 cd python
 python3 -m venv venv
 source venv/bin/activate
@@ -64,7 +64,7 @@ python soniox_async.py --delete_all_transcriptions
 <summary><b>Node.js</b></summary>
 
 ```sh
-# Set up environment:
+# Set up environment
 cd nodejs
 npm install
 
