@@ -1,0 +1,60 @@
+{
+  "expo": {
+    "name": "soniox-react-native-example",
+    "slug": "react-native-example",
+    "scheme": "react-native-example",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.timsoniox.exporeactnative"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true,
+      "package": "com.soniox.reactnativeexample"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/icon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
+        }
+      ],
+      [
+        "@siteed/expo-audio-studio",
+        {
+          "enablePhoneStateHandling": true,
+          "enableNotifications": true,
+          "enableBackgroundAudio": true,
+          "enableDeviceDetection": false,
+          "iosBackgroundModes": {
+            "useAudio": true,
+            "useProcessing": true,
+            "useExternalAccessory": false
+          },
+          "iosConfig": {
+            "allowBackgroundAudioControls": true,
+            "microphoneUsageDescription": "Live transcription requires microphone permission to record audio. Please grant microphone permission for Soniox app in your phone settings and try again."
+          },
+          "android": {
+            "permissions": ["RECORD_AUDIO", "READ_PHONE_STATE"],
+            "phoneStateUsageDescription": "We need to detect incoming calls to safely pause recording during calls."
+          }
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
