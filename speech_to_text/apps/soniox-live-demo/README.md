@@ -1,11 +1,15 @@
+# Soniox Live
+
 ## Overview
 
 Soniox Live is a **demo app** that shows how to stream audio from your microphone
-directly to the [Soniox Real-time API](https://soniox.com/docs/stt/api-reference/websocket-api) for instant transcription and translation.
+directly to the Soniox [Real-time API](https://soniox.com/docs/stt/api-reference/websocket-api) for instant transcription and translation.
 
 This is not the [Soniox App](https://soniox.com/soniox-app) (our end-user product). Instead, it is a
 **reference implementation** for developers who want to learn how to embed
 Soniox into their own web or mobile applications.
+
+![Web and mobile demo apps](https://soniox.com/docs/_next/image?url=%2Fdocs%2Fdemo-apps%2Fsoniox-live.png&w=1080&q=75)
 
 ## Features
 
@@ -33,8 +37,3 @@ We provide all the implementations with links to GitHub:
 - [Python server](./server)
 - [React frontend](./react) (web)
 - [React Native frontend](./react-native) (mobile)
-
-## Next Steps
-
-- Use this app as a starting point to embed Soniox into your own product
-- Explore Soniox Voice Bot for a conversational assistant example
