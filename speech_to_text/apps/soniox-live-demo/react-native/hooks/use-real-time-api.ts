@@ -31,7 +31,6 @@ type UseRealTimeAPIOptions = {
     translation?: TranslationConfig;
     audio?: { sampleRate?: number; channelCount?: number; encoding?: string };
     languageHints?: string[];
-    context?: string;
   };
   callbacks?: Callbacks;
 };
@@ -114,11 +113,11 @@ export function useRealTimeAPI({ apiKey, config, callbacks }: UseRealTimeAPIOpti
     // Sends STT config to the Soniox, calls user-defined callback (onStarted)
     // if provided.
     ws.onopen = () => {
-      const { audio, translation, languageHints, context } = configRef.current ?? {};
+      const { audio, translation, languageHints } = configRef.current ?? {};
       // Initial config that is first send to the Soniox
       const config = {
         api_key: key,
-        model: "stt-rt-preview",
+        model: "stt-rt-v3",
         audio_format: audio?.encoding ?? "pcm_s16le",
         sample_rate: audio?.sampleRate ?? 16000,
         num_channels: audio?.channelCount ?? 1,
@@ -127,7 +126,6 @@ export function useRealTimeAPI({ apiKey, config, callbacks }: UseRealTimeAPIOpti
         enable_endpoint_detection: true,
         translation: translation,
         languageHints,
-        context,
       };
       ws.send(JSON.stringify(config));
       updateState("Running");

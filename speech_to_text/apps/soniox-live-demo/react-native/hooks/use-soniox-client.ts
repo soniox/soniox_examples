@@ -15,7 +15,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 interface UseSonioxClientOptions {
   apiKey: string | (() => Promise<string>);
   languageHints?: string[];
-  context?: string;
   translation?: TranslationConfig;
   audio?: { sampleRate?: number; channelCount?: number; encoding?: string };
 }
@@ -50,7 +49,6 @@ export function useSonioxClient(options: UseSonioxClientOptions) {
     apiKey: options.apiKey,
     config: {
       languageHints: options.languageHints,
-      context: options.context,
       translation: options.translation,
       audio: options.audio,
     },

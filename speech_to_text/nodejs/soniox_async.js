@@ -5,11 +5,11 @@ import { parseArgs } from "node:util";
 const SONIOX_API_BASE_URL = "https://api.soniox.com";
 
 // Get Soniox STT config.
-function getConfig(audioUrl, fileId) {
+function getConfig(audioUrl, fileId, translation) {
   const config = {
     // Select the model to use.
     // See: soniox.com/docs/stt/models
-    model: "stt-async-preview",
+    model: "stt-async-v3",
 
     // Set language hints when possible to significantly improve accuracy.
     // See: soniox.com/docs/stt/concepts/language-hints
@@ -23,14 +23,31 @@ function getConfig(audioUrl, fileId) {
     // See: soniox.com/docs/stt/concepts/speaker-diarization
     enable_speaker_diarization: true,
 
-    // Set context to improve recognition of difficult and rare words.
-    // Context is a string and can include words, phrases, sentences, or summaries (limit: 10K chars).
+    // Set context to help the model understand your domain, recognize important terms,
+    // and apply custom vocabulary and translation preferences.
     // See: soniox.com/docs/stt/concepts/context
-    context: `
-      Celebrex, Zyrtec, Xanax, Prilosec, Amoxicillin Clavulanate Potassium
-      The customer, Maria Lopez, contacted BrightWay Insurance to update her auto policy
-      after purchasing a new vehicle.
-    `,
+    context: {
+      general: [
+        { key: "domain", value: "Healthcare" },
+        { key: "topic", value: "Diabetes management consultation" },
+        { key: "doctor", value: "Dr. Martha Smith" },
+        { key: "patient", value: "Mr. David Miller" },
+        { key: "organization", value: "St John's Hospital" },
+      ],
+      text: "Mr. David Miller visited his healthcare provider last month for a routine follow-up related to diabetes care. The clinician reviewed his recent test results, noted improved glucose levels, and adjusted his medication schedule accordingly. They also discussed meal planning strategies and scheduled the next check-up for early spring.",
+      terms: [
+        "Celebrex",
+        "Zyrtec",
+        "Xanax",
+        "Prilosec",
+        "Amoxicillin Clavulanate Potassium",
+      ],
+      translation_terms: [
+        { source: "Mr. Smith", target: "Sr. Smith" },
+        { source: "St John's", target: "St John's" },
+        { source: "stroke", target: "ictus" },
+      ],
+    },
 
     // Optional identifier to track this request (client-defined).
     // See: https://soniox.com/docs/stt/api-reference/transcriptions/create_transcription#request
@@ -47,6 +64,22 @@ function getConfig(audioUrl, fileId) {
   // Webhook.
   // You can set a webhook to get notified when the transcription finishes or fails.
   // See: https://soniox.com/docs/stt/api-reference/transcriptions/create_transcription#request
+
+  // Translation options.
+  // See: soniox.com/docs/stt/rt/real-time-translation#translation-modes
+  if (translation === "one_way") {
+    // Translates all languages into the target language.
+    config.translation = { type: "one_way", target_language: "es" };
+  } else if (translation === "two_way") {
+    // Translates from language_a to language_b and back from language_b to language_a.
+    config.translation = {
+      type: "two_way",
+      language_a: "en",
+      language_b: "es",
+    };
+  } else if (translation !== "none") {
+    throw new Error(`Unsupported translation: ${translation}`);
+  }
 
   return config;
 }
@@ -189,9 +222,8 @@ function renderTokens(finalTokens) {
 
   // Process all tokens in order.
   for (const token of finalTokens) {
-    let { text } = token;
-    const speaker = token.speaker;
-    const language = token.language;
+    let { text, speaker, language } = token;
+    const isTranslation = token.translation_status === "translation";
 
     // Speaker changed -> add a speaker tag.
     if (speaker !== undefined && speaker !== currentSpeaker) {
@@ -204,7 +236,8 @@ function renderTokens(finalTokens) {
     // Language changed -> add a language or translation tag.
     if (language !== undefined && language !== currentLanguage) {
       currentLanguage = language;
-      textParts.push(`\n[${currentLanguage}] `);
+      const prefix = isTranslation ? "[Translation] " : "";
+      textParts.push(`\n${prefix}[${currentLanguage}] `);
       text = text.trimStart();
     }
 
@@ -213,7 +246,7 @@ function renderTokens(finalTokens) {
   return textParts.join("");
 }
 
-async function transcribeFile(audioUrl, audioPath) {
+async function transcribeFile(audioUrl, audioPath, translation) {
   let fileId = null;
 
   if (!audioUrl && !audioPath) {
@@ -225,7 +258,7 @@ async function transcribeFile(audioUrl, audioPath) {
     fileId = await uploadAudio(audioPath);
   }
 
-  const config = getConfig(audioUrl, fileId);
+  const config = getConfig(audioUrl, fileId, translation);
   const transcriptionId = await createTranscription(config);
   await waitUntilCompleted(transcriptionId);
 
@@ -256,6 +289,7 @@ async function main() {
         type: "boolean",
         description: "Delete all transcriptions",
       },
+      translation: { type: "string", default: "none" },
     },
   });
 
@@ -269,7 +303,7 @@ async function main() {
     return;
   }
 
-  await transcribeFile(argv.audio_url, argv.audio_path);
+  await transcribeFile(argv.audio_url, argv.audio_path, argv.translation);
 }
 
 main().catch((err) => {

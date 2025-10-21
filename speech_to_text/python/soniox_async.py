@@ -9,11 +9,13 @@ SONIOX_API_BASE_URL = "https://api.soniox.com"
 
 
 # Get Soniox STT config.
-def get_config(audio_url: Optional[str], file_id: Optional[str]) -> dict:
+def get_config(
+    audio_url: Optional[str], file_id: Optional[str], translation: Optional[str]
+) -> dict:
     config = {
         # Select the model to use.
         # See: soniox.com/docs/stt/models
-        "model": "stt-async-preview",
+        "model": "stt-async-v3",
         #
         # Set language hints when possible to significantly improve accuracy.
         # See: soniox.com/docs/stt/concepts/language-hints
@@ -27,14 +29,31 @@ def get_config(audio_url: Optional[str], file_id: Optional[str]) -> dict:
         # See: soniox.com/docs/stt/concepts/speaker-diarization
         "enable_speaker_diarization": True,
         #
-        # Set context to improve recognition of difficult and rare words.
-        # Context is a string and can include words, phrases, sentences, or summaries (limit: 10K chars).
+        # Set context to help the model understand your domain, recognize important terms,
+        # and apply custom vocabulary and translation preferences.
         # See: soniox.com/docs/stt/concepts/context
-        "context": """
-            Celebrex, Zyrtec, Xanax, Prilosec, Amoxicillin Clavulanate Potassium            
-            The customer, Maria Lopez, contacted BrightWay Insurance to update her auto policy 
-            after purchasing a new vehicle.
-        """,
+        "context": {
+            "general": [
+                {"key": "domain", "value": "Healthcare"},
+                {"key": "topic", "value": "Diabetes management consultation"},
+                {"key": "doctor", "value": "Dr. Martha Smith"},
+                {"key": "patient", "value": "Mr. David Miller"},
+                {"key": "organization", "value": "St John's Hospital"},
+            ],
+            "text": "Mr. David Miller visited his healthcare provider last month for a routine follow-up related to diabetes care. The clinician reviewed his recent test results, noted improved glucose levels, and adjusted his medication schedule accordingly. They also discussed meal planning strategies and scheduled the next check-up for early spring.",
+            "terms": [
+                "Celebrex",
+                "Zyrtec",
+                "Xanax",
+                "Prilosec",
+                "Amoxicillin Clavulanate Potassium",
+            ],
+            "translation_terms": [
+                {"source": "Mr. Smith", "target": "Sr. Smith"},
+                {"source": "St John's", "target": "St John's"},
+                {"source": "stroke", "target": "ictus"},
+            ],
+        },
         #
         # Optional identifier to track this request (client-defined).
         # See: https://soniox.com/docs/stt/api-reference/transcriptions/create_transcription#request
@@ -52,6 +71,26 @@ def get_config(audio_url: Optional[str], file_id: Optional[str]) -> dict:
     # You can set a webhook to get notified when the transcription finishes or fails.
     # See: https://soniox.com/docs/stt/api-reference/transcriptions/create_transcription#request
 
+    # Translation options.
+    # See: soniox.com/docs/stt/rt/real-time-translation#translation-modes
+    if translation == "none":
+        pass
+    elif translation == "one_way":
+        # Translates all languages into the target language.
+        config["translation"] = {
+            "type": "one_way",
+            "target_language": "es",
+        }
+    elif translation == "two_way":
+        # Translates from language_a to language_b and back from language_b to language_a.
+        config["translation"] = {
+            "type": "two_way",
+            "language_a": "en",
+            "language_b": "es",
+        }
+    else:
+        raise ValueError(f"Unsupported translation: {translation}")
+
     return config
 
 
@@ -68,14 +107,17 @@ def upload_audio(session: Session, audio_path: str) -> str:
 
 def create_transcription(session: Session, config: dict) -> str:
     print("Creating transcription...")
-    res = session.post(
-        f"{SONIOX_API_BASE_URL}/v1/transcriptions",
-        json=config,
-    )
-    res.raise_for_status()
-    transcription_id = res.json()["id"]
-    print(f"Transcription ID: {transcription_id}")
-    return transcription_id
+    try:
+        res = session.post(
+            f"{SONIOX_API_BASE_URL}/v1/transcriptions",
+            json=config,
+        )
+        res.raise_for_status()
+        transcription_id = res.json()["id"]
+        print(f"Transcription ID: {transcription_id}")
+        return transcription_id
+    except Exception as e:
+        print("error here:", e)
 
 
 def wait_until_completed(session: Session, transcription_id: str) -> None:
@@ -176,6 +218,7 @@ def render_tokens(final_tokens: list[dict]) -> str:
         text = token["text"]
         speaker = token.get("speaker")
         language = token.get("language")
+        is_translation = token.get("translation_status") == "translation"
 
         # Speaker changed -> add a speaker tag.
         if speaker is not None and speaker != current_speaker:
@@ -188,7 +231,8 @@ def render_tokens(final_tokens: list[dict]) -> str:
         # Language changed -> add a language or translation tag.
         if language is not None and language != current_language:
             current_language = language
-            text_parts.append(f"\n[{current_language}] ")
+            prefix = "[Translation] " if is_translation else ""
+            text_parts.append(f"\n{prefix}[{current_language}] ")
             text = text.lstrip()
 
         text_parts.append(text)
@@ -200,6 +244,7 @@ def transcribe_file(
     session: Session,
     audio_url: Optional[str],
     audio_path: Optional[str],
+    translation: Optional[str],
 ) -> None:
     if audio_url is not None:
         # Public URL of the audio file to transcribe.
@@ -212,7 +257,7 @@ def transcribe_file(
     else:
         raise ValueError("Missing audio: audio_url or audio_path must be specified.")
 
-    config = get_config(audio_url, file_id)
+    config = get_config(audio_url, file_id, translation)
 
     transcription_id = create_transcription(session, config)
 
@@ -239,6 +284,7 @@ def main():
     )
     parser.add_argument("--delete_all_files", action="store_true")
     parser.add_argument("--delete_all_transcriptions", action="store_true")
+    parser.add_argument("--translation", default="none")
     args = parser.parse_args()
 
     api_key = os.environ.get("SONIOX_API_KEY")
@@ -267,7 +313,7 @@ def main():
     if not (args.audio_url or args.audio_path):
         parser.error("Provide --audio_url or --audio_path (or use a delete flag).")
 
-    transcribe_file(session, args.audio_url, args.audio_path)
+    transcribe_file(session, args.audio_url, args.audio_path, args.translation)
 
 
 if __name__ == "__main__":

@@ -19,7 +19,7 @@ def get_config(api_key: str, audio_format: str, translation: str) -> dict:
         #
         # Select the model to use.
         # See: soniox.com/docs/stt/models
-        "model": "stt-rt-preview",
+        "model": "stt-rt-v3",
         #
         # Set language hints when possible to significantly improve accuracy.
         # See: soniox.com/docs/stt/concepts/language-hints
@@ -33,14 +33,31 @@ def get_config(api_key: str, audio_format: str, translation: str) -> dict:
         # See: soniox.com/docs/stt/concepts/speaker-diarization
         "enable_speaker_diarization": True,
         #
-        # Set context to improve recognition of difficult and rare words.
-        # Context is a string and can include words, phrases, sentences, or summaries (limit: 10K chars).
+        # Set context to help the model understand your domain, recognize important terms,
+        # and apply custom vocabulary and translation preferences.
         # See: soniox.com/docs/stt/concepts/context
-        "context": """
-            Celebrex, Zyrtec, Xanax, Prilosec, Amoxicillin Clavulanate Potassium            
-            The customer, Maria Lopez, contacted BrightWay Insurance to update her auto policy 
-            after purchasing a new vehicle.
-        """,
+        "context": {
+            "general": [
+                {"key": "domain", "value": "Healthcare"},
+                {"key": "topic", "value": "Diabetes management consultation"},
+                {"key": "doctor", "value": "Dr. Martha Smith"},
+                {"key": "patient", "value": "Mr. David Miller"},
+                {"key": "organization", "value": "St John's Hospital"},
+            ],
+            "text": "Mr. David Miller visited his healthcare provider last month for a routine follow-up related to diabetes care. The clinician reviewed his recent test results, noted improved glucose levels, and adjusted his medication schedule accordingly. They also discussed meal planning strategies and scheduled the next check-up for early spring.",
+            "terms": [
+                "Celebrex",
+                "Zyrtec",
+                "Xanax",
+                "Prilosec",
+                "Amoxicillin Clavulanate Potassium",
+            ],
+            "translation_terms": [
+                {"source": "Mr. Smith", "target": "Sr. Smith"},
+                {"source": "St John's", "target": "St John's"},
+                {"source": "stroke", "target": "ictus"},
+            ],
+        },
         #
         # Use endpointing to detect when the speaker stops.
         # It finalizes all non-final tokens right away, minimizing latency.
