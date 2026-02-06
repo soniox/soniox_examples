@@ -12,7 +12,7 @@ function getConfig(apiKey, audioFormat, translation) {
 
     // Select the model to use.
     // See: soniox.com/docs/stt/models
-    model: "stt-rt-v3",
+    model: "stt-rt-v4",
 
     // Set language hints when possible to significantly improve accuracy.
     // See: soniox.com/docs/stt/concepts/language-hints

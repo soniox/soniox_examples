@@ -117,7 +117,7 @@ export function useRealTimeAPI({ apiKey, config, callbacks }: UseRealTimeAPIOpti
       // Initial config that is first send to the Soniox
       const config = {
         api_key: key,
-        model: "stt-rt-v3",
+        model: "stt-rt-v4",
         audio_format: audio?.encoding ?? "pcm_s16le",
         sample_rate: audio?.sampleRate ?? 16000,
         num_channels: audio?.channelCount ?? 1,

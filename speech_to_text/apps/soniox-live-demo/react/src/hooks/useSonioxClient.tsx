@@ -49,7 +49,7 @@ export default function useSonioxClient({
     // are transcribing or translating. For translation we also set if it is
     // one-way or two-way.
     sonioxClient.current?.start({
-      model: "stt-rt-v3",
+      model: "stt-rt-v4",
       enableLanguageIdentification: true,
       enableSpeakerDiarization: true,
       enableEndpointDetection: true,
