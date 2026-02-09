@@ -3,6 +3,7 @@
   "type": "module",
   "version": "1.0.0",
   "dependencies": {
+    "@soniox/node": "^1.0.0",
     "ws": "^8.18.3"
   }
 }
