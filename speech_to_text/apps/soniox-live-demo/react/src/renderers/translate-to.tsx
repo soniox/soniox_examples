@@ -1,38 +1,32 @@
 import { useEffect, useState } from "react";
+import { useRecording } from "@soniox/react";
 import StatusDisplay from "../components/status-display";
 import RecordButton from "../components/record-button";
 import { getLanguage, languages, type Language } from "../config/languages";
-import useSonioxClient from "@/hooks/useSonioxClient";
-import getAPIKey from "@/utils/get-api-key";
 import Renderer from "./renderer";
 import useAutoScroll from "@/hooks/useAutoScroll";
-import { isActiveState } from "@soniox/speech-to-text-web";
 
 export default function TranslateFromTo() {
   const [selectedLanguage, setSelectedLanguage] = useState<Language>(
     getLanguage("es"),
   );
 
-  const {
-    state,
-    finalTokens,
-    nonFinalTokens,
-    startTranscription,
-    stopTranscription,
-    error,
-  } = useSonioxClient({
-    apiKey: getAPIKey,
-    translationConfig: {
+  const recording = useRecording({
+    model: "stt-rt-v4",
+    enable_language_identification: true,
+    enable_speaker_diarization: true,
+    enable_endpoint_detection: true,
+    translation: {
       type: "one_way",
       target_language: selectedLanguage.code,
     },
   });
 
   useEffect(() => {
-    stopTranscription();
-  }, [selectedLanguage, stopTranscription]);
+    recording.cancel();
+  }, [selectedLanguage]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const allTokens = [...finalTokens, ...nonFinalTokens];
+  const allTokens = [...recording.finalTokens, ...recording.partialTokens];
   const leftContainerAutoScrollRef = useAutoScroll(allTokens);
   const rightContainerAutoScrollRef = useAutoScroll(allTokens);
 
@@ -49,7 +43,7 @@ export default function TranslateFromTo() {
         <h2 className="text-lg font-semibold text-gray-900">
           Translate From-To
         </h2>
-        <StatusDisplay state={state} />
+        <StatusDisplay state={recording.state} />
       </div>
 
       {/* Target language selector */}
@@ -63,7 +57,7 @@ export default function TranslateFromTo() {
         <select
           id="target-language"
           value={selectedLanguage.code}
-          disabled={isActiveState(state)}
+          disabled={recording.isActive}
           onChange={(e) => {
             setSelectedLanguage(getLanguage(e.target.value));
           }}
@@ -111,16 +105,19 @@ export default function TranslateFromTo() {
         </div>
       </div>
 
-      {error && (
+      {recording.error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
-          <div className="text-red-700 text-sm">Error: {error.message}</div>
+          <div className="text-red-700 text-sm">
+            Error: {recording.error.message}
+          </div>
         </div>
       )}
 
       <RecordButton
-        state={state}
-        stopTranscription={stopTranscription}
-        startTranscription={startTranscription}
+        isActive={recording.isActive}
+        isStopping={recording.state === "stopping"}
+        stop={recording.stop}
+        start={recording.start}
       />
     </div>
   );

@@ -1,27 +1,21 @@
 import { useEffect, useState } from "react";
+import { useRecording } from "@soniox/react";
 import StatusDisplay from "../components/status-display";
 import RecordButton from "../components/record-button";
 import { getLanguage, type Language, languages } from "../config/languages";
-import useSonioxClient from "@/hooks/useSonioxClient";
-import getAPIKey from "@/utils/get-api-key";
 import Renderer from "./renderer";
 import useAutoScroll from "@/hooks/useAutoScroll";
-import { isActiveState } from "@soniox/speech-to-text-web";
 
 export default function TranslateBetween() {
   const [languageA, setLanguageA] = useState<Language>(getLanguage("en"));
   const [languageB, setLanguageB] = useState<Language>(getLanguage("es"));
 
-  const {
-    state,
-    finalTokens,
-    nonFinalTokens,
-    startTranscription,
-    stopTranscription,
-    error,
-  } = useSonioxClient({
-    apiKey: getAPIKey,
-    translationConfig: {
+  const recording = useRecording({
+    model: "stt-rt-v4",
+    enable_language_identification: true,
+    enable_speaker_diarization: true,
+    enable_endpoint_detection: true,
+    translation: {
       type: "two_way",
       language_a: languageA.code,
       language_b: languageB.code,
@@ -29,10 +23,10 @@ export default function TranslateBetween() {
   });
 
   useEffect(() => {
-    stopTranscription();
-  }, [languageA, languageB, stopTranscription]);
+    recording.cancel();
+  }, [languageA, languageB]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const allTokens = [...finalTokens, ...nonFinalTokens];
+  const allTokens = [...recording.finalTokens, ...recording.partialTokens];
   const leftContainerAutoScrollRef = useAutoScroll(allTokens);
   const rightContainerAutoScrollRef = useAutoScroll(allTokens);
 
@@ -49,7 +43,7 @@ export default function TranslateBetween() {
         <h2 className="text-lg font-semibold text-gray-900">
           Translate Between
         </h2>
-        <StatusDisplay state={state} />
+        <StatusDisplay state={recording.state} />
       </div>
 
       {/* Language A selector */}
@@ -63,7 +57,7 @@ export default function TranslateBetween() {
         <select
           id="language-a"
           value={languageA.code}
-          disabled={isActiveState(state)}
+          disabled={recording.isActive}
           onChange={(e) => {
             setLanguageA(getLanguage(e.target.value));
           }}
@@ -88,7 +82,7 @@ export default function TranslateBetween() {
         <select
           id="language-b"
           value={languageB.code}
-          disabled={isActiveState(state)}
+          disabled={recording.isActive}
           onChange={(e) => {
             setLanguageB(getLanguage(e.target.value));
           }}
@@ -136,16 +130,19 @@ export default function TranslateBetween() {
         </div>
       </div>
 
-      {error && (
+      {recording.error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
-          <div className="text-red-700 text-sm">Error: {error.message}</div>
+          <div className="text-red-700 text-sm">
+            Error: {recording.error.message}
+          </div>
         </div>
       )}
 
       <RecordButton
-        state={state}
-        stopTranscription={stopTranscription}
-        startTranscription={startTranscription}
+        isActive={recording.isActive}
+        isStopping={recording.state === "stopping"}
+        stop={recording.stop}
+        start={recording.start}
       />
     </div>
   );
