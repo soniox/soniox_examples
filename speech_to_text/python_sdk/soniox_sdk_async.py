@@ -121,17 +121,17 @@ def transcribe_file(
     config = get_config(translation)
 
     print("Creating transcription...")
-    transcription = client.transcriptions.create(
+    transcription = client.stt.create(
         config=config, file_id=file.id if file else None, audio_url=audio_url
     )
     print("Waiting for transcription...")
-    client.transcriptions.wait(transcription.id)
+    client.stt.wait(transcription.id)
 
-    result = client.transcriptions.get_transcript(transcription.id)
+    result = client.stt.get_transcript(transcription.id)
 
     print(render_tokens(result.tokens, []))
 
-    client.transcriptions.delete(transcription.id)
+    client.stt.delete(transcription.id)
 
     if file is not None:
         client.files.delete(file.id)
@@ -169,7 +169,7 @@ def main():
     # Delete all transcriptions.
     if args.delete_all_transcriptions:
         print("Deleting all transcriptions...")
-        client.transcriptions.delete_all()
+        client.stt.delete_all()
         return
 
     # If not deleting, require one audio source.
