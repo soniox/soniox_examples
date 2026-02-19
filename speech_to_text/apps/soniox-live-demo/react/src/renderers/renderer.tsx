@@ -1,10 +1,17 @@
-import { type Token } from "@soniox/speech-to-text-web";
 import { getLanguage } from "@/config/languages";
 import SpeakerLabel from "../components/speaker-label";
 import React from "react";
 
+interface Token {
+  text: string;
+  is_final: boolean;
+  speaker?: string;
+  language?: string;
+  translation_status?: "none" | "original" | "translation";
+}
+
 interface RendererProps {
-  tokens: Token[];
+  tokens: readonly Token[];
   placeholder: string;
 }
 
@@ -23,15 +30,6 @@ export default function Renderer({ tokens, placeholder }: RendererProps) {
       ) : (
         <div>
           {tokens.map((token, idx) => {
-            // If its an end token, show it as italicized text
-            if (token.text === "<end>") {
-              return (
-                <span
-                  key={`end-token-${idx}`}
-                  className="text-gray-400 italic text-xs"
-                >{` <end>`}</span>
-              );
-            }
             // Track speaker changes to show speaker labels only when speaker changes
             const isNewSpeaker = token.speaker && token.speaker !== lastSpeaker;
             const isNewLanguage =

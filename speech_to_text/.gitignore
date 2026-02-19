@@ -10,3 +10,4 @@ target/
 composer-setup.php
 composer.phar
 .env
+generated/

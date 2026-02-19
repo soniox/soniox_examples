@@ -1,17 +1,16 @@
-import type { Token } from "@soniox/speech-to-text-web";
 import { useEffect, useRef } from "react";
 
-export default function useAutoScroll(tokens: Token[]) {
+export default function useAutoScroll(items: readonly unknown[]) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (tokens.length) {
+    if (items.length) {
       ref.current?.scrollTo({
         top: ref.current.scrollHeight,
         behavior: "smooth",
       });
     }
-  }, [tokens]);
+  }, [items]);
 
   return ref;
 }
