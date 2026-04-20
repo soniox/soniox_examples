@@ -16,21 +16,27 @@ The examples are designed to be practical, minimal, and easy to adapt to product
 All up-to-date Speech-to-Text examples live under the `/speech_to_text/` directory.
 
 They include:
+- **Python SDK examples**
+- **Node SDK examples**
 - **Python examples**
-- **Node.js examples**
+- **Node examples**
 - A full **Soniox Live Demo** app built with **React** and **React Native** for web and mobile
 
 ---
 
 ### Links to examples
 
-- **Python & Node.js STT Examples**  
+- **Python SDK & Node SDK & Python & Node STT Examples**  
   [/speech_to_text/](/speech_to_text/README.md)
   Real-time transcription, async transcription, and speech translation.
 
 - **Soniox Live Demo (Web & Mobile)**  
-  [/speech_to_text/apps/soniox-live-demo/](/speech_to_text/apps/soniox-live-demo/)
+  [/apps/soniox-live-demo/](/apps/soniox-live-demo/)
   A complete React and React Native app showcasing live transcription and translation.
+
+- **Soniox Voice Bot Demo**  
+  [/apps/soniox-voice-bot-demo/](/apps/soniox-voice-bot-demo/)
+  A complete reference implementation for building a real-time, voice-to-voice conversational AI assistant.
 
 ---
 
@@ -51,6 +57,8 @@ Check out the [Soniox AI engineering documentation](https://soniox.com/docs/stt/
 - [Soniox website](https://soniox.com)
 - [Soniox documentation](https://soniox.com/docs)
 - [Soniox Discord community](https://discord.gg/rWfnk9uM5j)
+- [Soniox Python SDK GitHub](https://www.github.com/soniox/soniox-python)
+- [Soniox Node SDK GitHub](https://www.github.com/soniox/soniox-js)
 
 ---
 

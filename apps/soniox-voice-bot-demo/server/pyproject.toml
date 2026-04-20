@@ -1,0 +1,24 @@
+[project]
+name = "conversational-voice-bot"
+version = "0.1.0"
+description = "Demo app showcasing how to build a real-time conversational assistant using the Soniox API."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "openai>=1.101.0",
+    "python-dotenv>=1.1.1",
+    "structlog>=25.4.0",
+    "websockets>=15.0.1",
+    "silero-vad",
+    "torch",
+    "torchaudio",
+    "onnxruntime",
+    "numpy",
+    "pydantic>=2.11.7",
+]
+
+[dependency-groups]
+dev = ["ruff>=0.12.10"]
+
+[tool.ruff]
+lint.extend-select = ["I"]
