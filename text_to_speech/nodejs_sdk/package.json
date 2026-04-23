@@ -1,0 +1,8 @@
+{
+  "name": "soniox_examples_nodejs",
+  "type": "module",
+  "version": "1.0.0",
+  "dependencies": {
+    "@soniox/node": "^2.0.0"
+  }
+}
