@@ -1,0 +1,14 @@
+[project]
+name = "twilio_websocket_relay"
+version = "0.1.0"
+description = "Accepts Twilio WebSocket connections and relays them to voice assistant."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "audioop-lts>=0.2.2",
+    "dotenv>=0.9.9",
+    "fastapi>=0.116.1",
+    "twilio>=9.7.2",
+    "uvicorn>=0.35.0",
+    "websockets>=15.0.1",
+]
