@@ -51,15 +51,15 @@ def get_config(
         model=model,
         #
         # Set the language of the input text.
-        # See: soniox.com/docs/tts/languages
+        # See: soniox.com/docs/tts/concepts/supported-languages
         language=language,
         #
         # Select the voice to use.
-        # See: soniox.com/docs/tts/voices
+        # See: soniox.com/docs/tts/concepts/voices
         voice=voice,
         #
         # Set output audio format and optional encoding parameters.
-        # See: soniox.com/docs/tts/api-reference/websocket-api
+        # See: https://soniox.com/docs/tts/rest-api/generate-speech
         audio_format=audio_format,
         sample_rate=sample_rate,
         bitrate=bitrate,

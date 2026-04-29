@@ -83,15 +83,15 @@ function getConfig({
     model: MODEL,
 
     // Set the language of the input text.
-    // See: soniox.com/docs/tts/languages
+    // See: soniox.com/docs/tts/concepts/supported-languages
     language,
 
     // Select the voice to use.
-    // See: soniox.com/docs/tts/voices
+    // See: soniox.com/docs/tts/concepts/voices
     voice,
 
     // Audio format.
-    // See: soniox.com/docs/tts/audio-formats
+    // See: https://soniox.com/docs/tts/concepts/audio-formats
     audio_format: audioFormat,
 
     // Input text.

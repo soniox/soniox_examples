@@ -90,15 +90,15 @@ function getStreamConfig({
     model,
 
     // Set the language of the input text.
-    // See: soniox.com/docs/tts/languages
+    // See: soniox.com/docs/tts/concepts/supported-languages
     language,
 
     // Select the voice to use.
-    // See: soniox.com/docs/tts/voices
+    // See: soniox.com/docs/tts/concepts/voices
     voice,
 
     // Set output audio format and optional encoding parameters.
-    // See: soniox.com/docs/tts/api-reference/websocket-api
+    // See: soniox.com/docs/api-reference/tts/generate_tts
     audio_format: audioFormat,
   };
 

@@ -64,15 +64,15 @@ def get_config(
         "model": MODEL,
         #
         # Set the language of the input text.
-        # See: soniox.com/docs/tts/languages
+        # See: soniox.com/docs/tts/concepts/supported-languages
         "language": language,
         #
         # Select the voice to use.
-        # See: soniox.com/docs/tts/voices
+        # See: soniox.com/docs/tts/concepts/voices
         "voice": voice,
         #
         # Audio format.
-        # See: soniox.com/docs/tts/audio-formats
+        # See: soniox.com/docs/tts/concepts/audio-formats
         "audio_format": audio_format,
     }
 
