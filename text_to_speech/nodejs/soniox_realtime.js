@@ -5,7 +5,7 @@ import { parseArgs } from "node:util";
 import process from "process";
 
 const SONIOX_TTS_WEBSOCKET_URL = "wss://tts-rt.soniox.com/tts-websocket";
-const MODEL = "tts-rt-v1-preview";
+const MODEL = "tts-rt-v1";
 const VALID_SAMPLE_RATES = [8000, 16000, 24000, 44100, 48000];
 const VALID_BITRATES = [32000, 64000, 96000, 128000, 192000, 256000, 320000];
 const VALID_AUDIO_FORMATS = [

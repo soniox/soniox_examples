@@ -192,7 +192,7 @@ async function main() {
   const { values: argv } = parseArgs({
     options: {
       line: { type: "string", multiple: true },
-      model: { type: "string", default: "tts-rt-v1-preview" },
+      model: { type: "string", default: "tts-rt-v1" },
       language: { type: "string", default: "en" },
       voice: { type: "string", default: "Adrian" },
       audio_format: { type: "string", default: "pcm_s16le" },

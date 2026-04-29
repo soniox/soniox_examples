@@ -88,7 +88,7 @@ def main() -> None:
         ),
         help="Text to generate into speech.",
     )
-    parser.add_argument("--model", default="tts-rt-v1-preview")
+    parser.add_argument("--model", default="tts-rt-v1")
     parser.add_argument("--language", default="en")
     parser.add_argument("--voice", default="Adrian")
     parser.add_argument("--audio_format", default="wav")

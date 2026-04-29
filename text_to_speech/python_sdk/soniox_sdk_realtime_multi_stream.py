@@ -137,7 +137,7 @@ def run_multiplexed_session(
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model", default="tts-rt-v1-preview")
+    parser.add_argument("--model", default="tts-rt-v1")
     parser.add_argument("--audio_format", default="wav")
     parser.add_argument("--sample_rate", type=int)
     parser.add_argument("--bitrate", type=int)

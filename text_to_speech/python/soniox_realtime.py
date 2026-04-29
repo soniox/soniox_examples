@@ -10,7 +10,7 @@ from websockets import ConnectionClosedOK
 from websockets.sync.client import connect
 
 SONIOX_TTS_WEBSOCKET_URL = "wss://tts-rt.soniox.com/tts-websocket"
-MODEL = "tts-rt-v1-preview"
+MODEL = "tts-rt-v1"
 VALID_SAMPLE_RATES = [8000, 16000, 24000, 44100, 48000]
 VALID_BITRATES = [32000, 64000, 96000, 128000, 192000, 256000, 320000]
 VALID_AUDIO_FORMATS = [

@@ -139,7 +139,7 @@ def main() -> None:
         default=None,
         help="Line to send to realtime TTS (repeat --line for multiple lines).",
     )
-    parser.add_argument("--model", default="tts-rt-v1-preview")
+    parser.add_argument("--model", default="tts-rt-v1")
     parser.add_argument("--language", default="en")
     parser.add_argument("--voice", default="Adrian")
     parser.add_argument("--audio_format", default="wav")

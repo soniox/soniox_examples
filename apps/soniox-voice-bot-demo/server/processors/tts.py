@@ -18,7 +18,7 @@ from messages import (
 )
 from processors.message_processor import MessageProcessor
 
-DEFAULT_MODEL = "tts-rt-v1-preview"
+DEFAULT_MODEL = "tts-rt-v1"
 DEFAULT_VOICE = "Alina"
 DEFAULT_LANGUAGE = "en"
 DEFAULT_AUDIO_FORMAT = "pcm_s16le"
@@ -43,7 +43,7 @@ class TTSProcessor(MessageProcessor):
         Args:
             api_key: The API key for the Soniox TTS API.
             api_host: The WebSocket host for the TTS service.
-            model: The TTS model to use. Defaults to "tts-rt-v1-preview".
+            model: The TTS model to use. Defaults to "tts-rt-v1".
             voice: The voice to use. Defaults to "Alina".
             language: The language code. Defaults to "en".
             audio_format: The output audio format. Defaults to "pcm_s16le".
