@@ -99,7 +99,7 @@ function getConfig({
     voice,
 
     // Audio format.
-    // See: https://soniox.com/docs/tts/concepts/audio-formats
+    // See: soniox.com/docs/tts/concepts/audio-formats
     audio_format: audioFormat,
   };
 
@@ -197,7 +197,7 @@ function runSession({
       }
 
       // Error from server.
-      // See: https://soniox.com/docs/tts/api-reference/websocket-api#error-response
+      // See: soniox.com/docs/api-reference/tts/generate_tts#errors
       if (res.error_code) {
         console.error(`Error: ${res.error_code} - ${res.error_message}`);
         ws.close();

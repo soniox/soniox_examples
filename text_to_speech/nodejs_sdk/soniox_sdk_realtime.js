@@ -98,7 +98,7 @@ function getStreamConfig({
     voice,
 
     // Set output audio format and optional encoding parameters.
-    // See: soniox.com/docs/api-reference/tts/generate_tts
+    // See: soniox.com/docs/tts/concepts/audio-formats
     audio_format: audioFormat,
   };
 

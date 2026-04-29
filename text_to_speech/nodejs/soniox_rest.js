@@ -91,7 +91,7 @@ function getConfig({
     voice,
 
     // Audio format.
-    // See: https://soniox.com/docs/tts/concepts/audio-formats
+    // See: soniox.com/docs/tts/concepts/audio-formats
     audio_format: audioFormat,
 
     // Input text.

@@ -59,7 +59,7 @@ def get_config(
         voice=voice,
         #
         # Set output audio format and optional encoding parameters.
-        # See: https://soniox.com/docs/tts/rest-api/generate-speech
+        # See: soniox.com/docs/tts/concepts/audio-formats
         audio_format=audio_format,
         sample_rate=sample_rate,
         bitrate=bitrate,
