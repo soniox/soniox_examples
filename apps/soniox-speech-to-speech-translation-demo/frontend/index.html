@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Soniox Speech Translation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-logo">soniox</span>
+        <span class="brand-name">speech translation</span>
+      </div>
+
+      <div class="section">
+        <h3>1. Target language</h3>
+        <select id="target-language"></select>
+      </div>
+
+      <div class="section">
+        <h3>2. Voice</h3>
+        <select id="voice"></select>
+      </div>
+
+      <div class="section">
+        <h3>3. Settings (optional)</h3>
+        <label class="checkbox">
+          <input type="checkbox" id="diarization" checked>
+          Enable speaker diarization
+        </label>
+        <label class="checkbox">
+          <input type="checkbox" id="lang-id" checked>
+          Enable language identification
+        </label>
+        <label class="checkbox">
+          <input type="checkbox" id="tts" checked>
+          Enable spoken translation
+        </label>
+      </div>
+
+      <div class="section">
+        <h3>4. Test with audio URL (optional)</h3>
+        <input type="text" id="audio-url" class="audio-url-input" placeholder="https://example.com/audio.mp3">
+      </div>
+
+      <div class="sidebar-footer">
+        <span id="status" class="status">Ready</span>
+        <div class="action-row" data-mode="file">
+          <button id="action" class="action-btn" data-state="idle">
+            <svg class="icon icon-mic" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+              <path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/>
+            </svg>
+            <svg class="icon icon-play" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+              <path d="M8 5v14l11-7L8 5z"/>
+            </svg>
+            <span class="btn-label">Play audio file</span>
+          </button>
+          <button id="mode-toggle" class="mode-toggle" type="button" title="Switch input mode">
+            <svg class="icon icon-mic" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+              <path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/>
+            </svg>
+            <svg class="icon icon-play" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
+              <path d="M8 5v14l11-7L8 5z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <section class="column">
+        <h2>Original</h2>
+        <div id="original" class="transcript"></div>
+      </section>
+      <section class="column">
+        <h2>Translation</h2>
+        <div id="translation" class="transcript"></div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+[project]
+name = "speech-to-speech-translation"
+version = "0.1.0"
+description = "A small demo that takes speech — from your microphone or from a hosted audio file — transcribes and translates it in real time, and (optionally) plays the translation back as speech."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "dotenv>=0.9.9",
+    "fastapi>=0.136.1",
+    "httpx>=0.28.1",
+    "uvicorn>=0.46.0",
+    "websockets>=16.0",
+]

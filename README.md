@@ -38,6 +38,10 @@ They include:
   [/apps/soniox-voice-bot-demo/](/apps/soniox-voice-bot-demo/)
   A complete reference implementation for building a real-time, voice-to-voice conversational AI assistant.
 
+- **Soniox Live Speech-to-Speech Translation Demo**  
+  [/apps/soniox-speech-to-speech-translation-demo/](/apps/soniox-speech-to-speech-translation-demo/)
+  Live speech-to-speech translation from a selected audio file or microphone.
+
 ---
 
 ## Use AI to speed up development
