@@ -18,7 +18,9 @@ The service consists of four main components that process messages concurrently:
 - **Voice Activity Detection (VAD) Processor**: Uses Silero VAD to detect speech boundaries in incoming audio. Emits `UserSpeechStartMessage` and `UserSpeechEndMessage` events to interrupt TTS when the user starts speaking.
 - **Speech-to-Text (STT) Processor**: Receives the raw audio from the user and uses the Soniox API to convert it into text tokens in real-time. It generates `TranscriptionMessage` events as the user speaks.
 - **Language Model (LLM) Processor**: Receives transcription messages, manages the conversation history, and uses a large language model to decide what to do next. It can either generate a direct text response or use one of the provided tools.
-- **Text-to-Speech (TTS) Processor**: Receives streaming text chunks from the LLM and uses the Soniox API to convert them into audible speech in real-time, streaming audio back to the user as it's generated.
+- **Text-to-Speech (TTS) Processor**: Converts the LLM's text into audible speech and streams the audio (raw 16-bit PCM) back to the user. Two interchangeable providers are available behind the same `MessageProcessor` interface, selected with the `TTS_PROVIDER` env var:
+  - `soniox` — Soniox streaming WebSocket TTS (`SonioxTTSProcessor`), synthesizing as the LLM streams.
+  - `sixtydb` *(default)* — 60db HTTP TTS (`SixtyDBTTSProcessor`), synthesizing each completed turn via `POST /tts-synthesize`. The provider is chosen by `processors/tts_provider.py`, so the rest of the app is provider-agnostic.
 
 ### Data & session flow
 
@@ -59,11 +61,20 @@ Messages intended for the user (like transcription updates, LLM text chunks, or 
    Copy `.env.example` to `.env` and fill in your API keys:
 
    ```sh
-   # Soniox is used for speech-to-text and text-to-speech
+   # Soniox is used for speech-to-text (and TTS when TTS_PROVIDER=soniox)
    SONIOX_API_KEY=your_soniox_key
    # OpenAI is used for the large language model
    OPENAI_API_KEY=your_openai_key
+
+   # TTS provider: "sixtydb" (default) or "soniox"
+   TTS_PROVIDER=sixtydb
+   # 60db TTS (used when TTS_PROVIDER=sixtydb)
+   SIXTYDB_API_KEY=your_60db_key
+   SIXTYDB_VOICE_ID=your_60db_voice_id
    ```
+
+   > 60db's voice is set with `SIXTYDB_VOICE_ID`; the `voice` query param only
+   > applies to the Soniox provider.
 
 4. **Run the backend server:**
 

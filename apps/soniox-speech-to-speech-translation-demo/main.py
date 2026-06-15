@@ -1,13 +1,20 @@
-import os, json, asyncio, base64, websockets, httpx
+import os, json, asyncio, websockets, httpx
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
+
+from tts import make_tts_backend
 
 load_dotenv(override=True)
 
 SONIOX_API_KEY = os.environ["SONIOX_API_KEY"]
 STT_URL = "wss://stt-rt.soniox.com/transcribe-websocket"
-TTS_URL = "wss://tts-rt.soniox.com/tts-websocket"
+
+# TTS provider selection. Defaults to 60db; set to "soniox" for Soniox TTS.
+TTS_PROVIDER = os.getenv("TTS_PROVIDER", "sixtydb")
+SIXTYDB_API_KEY = os.getenv("SIXTYDB_API_KEY", "")
+SIXTYDB_VOICE_ID = os.getenv("SIXTYDB_VOICE_ID", "")
+SIXTYDB_API_BASE = os.getenv("SIXTYDB_API_BASE", "https://api.60db.ai")
 
 app = FastAPI()
 
@@ -25,18 +32,6 @@ def get_stt_config(diarization: bool, lang_id: bool, target: str) -> dict:
     }
 
 
-def get_tts_config(stream_id: str, voice: str, lang: str) -> dict:
-    return {
-        "api_key": SONIOX_API_KEY,
-        "stream_id": stream_id,
-        "model": "tts-rt-v1",
-        "voice": voice,
-        "language": lang,
-        "audio_format": "pcm_s16le",
-        "sample_rate": 24000,
-    }
-
-
 @app.websocket("/ws/translate")
 async def translation_websocket(
     browser_ws: WebSocket,
@@ -50,15 +45,15 @@ async def translation_websocket(
 ) -> None:
     await browser_ws.accept()
     stt_ws = None
-    tts_ws = None
+    tts_backend = None
     stt_config = get_stt_config(
         diarization=diarize, lang_id=lang_id, target=target_lang
     )
     # Queue decouples STT producing tokens from TTS consuming them — important
     # when the source speaks faster than TTS can synthesize.
     tts_queue = asyncio.Queue() if tts else None
-    # Shared between handle_stt (sets stt_done), tts_sender (writes current_stream_id),
-    # and pipe_tts_to_browser (reads both to decide when the session is over).
+    # Shared with the TTS backend: handle_stt sets stt_done; the Soniox backend
+    # uses current_stream_id to decide when the session's final audio has played.
     tts_state = {"current_stream_id": None, "stt_done": False}
     try:
         stt_ws = await websockets.connect(STT_URL)
@@ -75,25 +70,18 @@ async def translation_websocket(
             input_coro = pipe_browser_audio_to_stt(browser_ws=browser_ws, stt_ws=stt_ws)
 
         if tts:
-            tts_ws = await websockets.connect(TTS_URL)
-
-            tts_idle = asyncio.Event()
-            tts_idle.set()  # default: no stream open, free to open one
-
-            # Pre-open a TTS stream so the first utterance doesn't pay the
-            # round-trip for stream setup.
-            try:
-                await tts_ws.send(
-                    json.dumps(
-                        get_tts_config(
-                            stream_id="prewarm", voice=voice, lang=target_lang
-                        )
-                    )
-                )
-                tts_state["current_stream_id"] = "prewarm"
-                tts_idle.clear()
-            except websockets.WebSocketException:
-                pass
+            # The backend (Soniox WebSocket or 60db HTTP) is interchangeable: it
+            # consumes translated text from tts_queue and streams PCM to the
+            # browser. The rest of the handler doesn't care which one is used.
+            tts_backend = make_tts_backend(
+                TTS_PROVIDER,
+                voice=voice,
+                target_lang=target_lang,
+                soniox_api_key=SONIOX_API_KEY,
+                sixtydb_api_key=SIXTYDB_API_KEY,
+                sixtydb_voice_id=SIXTYDB_VOICE_ID,
+                sixtydb_base_url=SIXTYDB_API_BASE,
+            )
 
         async with asyncio.TaskGroup() as tg:
             tg.create_task(input_coro)
@@ -107,32 +95,20 @@ async def translation_websocket(
             )
             if tts:
                 tg.create_task(
-                    tts_sender(
+                    tts_backend.run(
                         tts_queue=tts_queue,
-                        tts_idle=tts_idle,
-                        tts_state=tts_state,
-                        tts_ws=tts_ws,
-                        target_lang=target_lang,
-                        voice=voice,
-                    )
-                )
-                tg.create_task(
-                    pipe_tts_to_browser(
-                        tts_ws=tts_ws,
                         browser_ws=browser_ws,
-                        tts_idle=tts_idle,
                         tts_state=tts_state,
                     )
                 )
-                tg.create_task(tts_keepalive(tts_ws=tts_ws))
 
     except* WebSocketDisconnect:
         pass
     finally:
         if stt_ws is not None:
             await stt_ws.close()
-        if tts_ws is not None:
-            await tts_ws.close()
+        if tts_backend is not None:
+            await tts_backend.aclose()
 
 
 async def pipe_browser_audio_to_stt(browser_ws: WebSocket, stt_ws) -> None:
@@ -207,7 +183,7 @@ async def handle_stt(
         print(f"Error {e}")
     finally:
         if tts_queue is not None:
-            # Signal tts_sender to wrap up: close any open stream, then exit.
+            # Signal the TTS backend to wrap up: flush the last utterance, then exit.
             await tts_queue.put(("end", None))
             await tts_queue.put(None)
         tts_state["stt_done"] = True
@@ -221,110 +197,4 @@ async def handle_stt(
                 pass
 
 
-async def tts_sender(
-    tts_queue: asyncio.Queue,
-    tts_idle: asyncio.Event,
-    tts_state: dict,
-    tts_ws,
-    target_lang: str,
-    voice: str,
-) -> None:
-    stream_counter = 0
-    current_stream_used = False
-    try:
-        while True:
-            data = await tts_queue.get()
-
-            if data is None:
-                break
-
-            kind, payload = data
-            if kind == "text":
-                # Open a new stream if needed
-                if tts_state["current_stream_id"] is None:
-                    await tts_idle.wait()
-                    stream_counter += 1
-                    tts_state["current_stream_id"] = f"utterance-{stream_counter}"
-                    config = get_tts_config(
-                        stream_id=tts_state["current_stream_id"],
-                        voice=voice,
-                        lang=target_lang,
-                    )
-                    await tts_ws.send(json.dumps(config))
-                # Send the text chunk
-                pkg = {
-                    "stream_id": tts_state["current_stream_id"],
-                    "text": payload,
-                    "text_end": False,
-                }
-                await tts_ws.send(json.dumps(pkg))
-                current_stream_used = True
-            elif kind == "end":
-                if tts_state["current_stream_id"] is not None and current_stream_used:
-                    tts_idle.clear()  # mark stream as still draining
-                    pkg = {
-                        "stream_id": tts_state["current_stream_id"],
-                        "text": "",
-                        "text_end": True,
-                    }
-                    await tts_ws.send(json.dumps(pkg))
-                    tts_state["current_stream_id"] = None
-                    current_stream_used = False
-    except websockets.ConnectionClosedOK:
-        pass
-    except websockets.ConnectionClosedError as e:
-        print(f"TTS WS closed: {e}")
-
-
-async def pipe_tts_to_browser(
-    tts_ws,
-    browser_ws: WebSocket,
-    tts_idle: asyncio.Event,
-    tts_state: dict,
-) -> None:
-    try:
-        while True:
-            message = await tts_ws.recv()
-            data = json.loads(message)
-
-            if data.get("error_code") is not None:
-                print(
-                    f"Error in stream_id {data['stream_id']}: {data['error_code']} - {data['error_message']}"
-                )
-
-            audio_b64 = data.get("audio")
-            if audio_b64:
-                await browser_ws.send_bytes(base64.b64decode(audio_b64))
-
-            if data.get("terminated"):
-                tts_idle.set()
-                if data["stream_id"] == tts_state["current_stream_id"]:
-                    tts_state["current_stream_id"] = None
-                # Once STT is finished and no stream remains open, this
-                # terminated event marked the very last TTS audio of the
-                # session — tell the browser it's safe to stop.
-                if tts_state["stt_done"] and tts_state["current_stream_id"] is None:
-                    try:
-                        await browser_ws.send_json({"session_done": True})
-                    except Exception:
-                        pass
-                    await tts_ws.close()
-                    break
-    except (WebSocketDisconnect, RuntimeError, websockets.ConnectionClosedOK):
-        pass
-    except websockets.ConnectionClosedError as e:
-        print(f"Error {e}")
-
-
-async def tts_keepalive(tts_ws):
-    try:
-        while True:
-            await asyncio.sleep(20)
-            await tts_ws.send(json.dumps({"keep_alive": True}))
-    except websockets.ConnectionClosedOK:
-        pass
-    except websockets.ConnectionClosedError as e:
-        print(f"TTS WS closed: {e}")
-
-
-app.mount("/", StaticFiles(directory="web", html=True), name="static")
+app.mount("/", StaticFiles(directory="frontend", html=True), name="static")

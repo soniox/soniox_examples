@@ -17,7 +17,7 @@ from messages import ErrorMessage
 from processors.llm import LLMProcessor
 from processors.message_processor import MessageProcessor
 from processors.stt import STTProcessor
-from processors.tts import TTSProcessor
+from processors.tts_provider import make_tts_processor
 from processors.vad import VADProcessor
 from session import Session
 from tools import (
@@ -36,8 +36,17 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-5.4-mini")
 
-SONIOX_API_KEY_TTS = os.getenv("SONIOX_API_KEY_TTS", "")
+# TTS provider selection. Defaults to 60db; set to "soniox" for Soniox TTS.
+TTS_PROVIDER = os.getenv("TTS_PROVIDER", "sixtydb")
+
+# Soniox TTS uses a separate key/host by default, falling back to the main key.
+SONIOX_API_KEY_TTS = os.getenv("SONIOX_API_KEY_TTS", "") or SONIOX_API_KEY
 SONIOX_API_HOST_TTS = os.getenv("SONIOX_API_HOST_TTS", "")
+
+# 60db TTS configuration.
+SIXTYDB_API_KEY = os.getenv("SIXTYDB_API_KEY", "")
+SIXTYDB_VOICE_ID = os.getenv("SIXTYDB_VOICE_ID", "")
+SIXTYDB_API_BASE = os.getenv("SIXTYDB_API_BASE", "https://api.60db.ai")
 
 
 class QueryParams(pydantic.BaseModel):
@@ -112,12 +121,16 @@ async def handle(websocket: ServerConnection):
             system_message=get_system_message(LANGUAGES_MAP[params.language]),
             tools=get_tools(),
         ),
-        TTSProcessor(
-            api_key=SONIOX_API_KEY_TTS,
-            api_host=SONIOX_API_HOST_TTS,
+        make_tts_processor(
+            TTS_PROVIDER,
             language=params.language,
-            sample_rate=params.audio_out_sample_rate,
             voice=params.voice,
+            sample_rate=params.audio_out_sample_rate,
+            soniox_api_key=SONIOX_API_KEY_TTS,
+            soniox_api_host=SONIOX_API_HOST_TTS,
+            sixtydb_api_key=SIXTYDB_API_KEY,
+            sixtydb_voice_id=SIXTYDB_VOICE_ID,
+            sixtydb_base_url=SIXTYDB_API_BASE,
         ),
     ]
 

@@ -25,8 +25,8 @@ DEFAULT_AUDIO_FORMAT = "pcm_s16le"
 DEFAULT_SAMPLE_RATE = 24000
 
 
-class TTSProcessor(MessageProcessor):
-    """Processor that converts LLM text output to speech using streaming TTS."""
+class SonioxTTSProcessor(MessageProcessor):
+    """Processor that converts LLM text output to speech using Soniox streaming TTS."""
 
     def __init__(
         self,
@@ -243,3 +243,9 @@ class TTSProcessor(MessageProcessor):
         except websockets.exceptions.ConnectionClosed:
             # Expected when closing the connection
             self.log.debug("Connection to Soniox API closed")
+
+
+# Backwards-compatible alias: this module used to export a single ``TTSProcessor``.
+# 60db is now available as an alternative provider (see ``tts_sixtydb.py`` and
+# ``tts_provider.py``), so the Soniox implementation has an explicit name.
+TTSProcessor = SonioxTTSProcessor
