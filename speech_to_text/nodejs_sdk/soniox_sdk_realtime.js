@@ -12,7 +12,7 @@ function getSessionConfig(audioFormat, translation) {
   const config = {
     // Select the model to use.
     // See: soniox.com/docs/stt/models
-    model: 'stt-rt-v4',
+    model: 'stt-rt-v5',
 
     // Set language hints when possible to significantly improve accuracy.
     // See: soniox.com/docs/stt/concepts/language-hints

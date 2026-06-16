@@ -19,7 +19,7 @@ def get_config(api_key: str, audio_format: str, translation: str) -> dict:
         #
         # Select the model to use.
         # See: soniox.com/docs/stt/models
-        "model": "stt-rt-v4",
+        "model": "stt-rt-v5",
         #
         # Set language hints when possible to significantly improve accuracy.
         # See: soniox.com/docs/stt/concepts/language-hints

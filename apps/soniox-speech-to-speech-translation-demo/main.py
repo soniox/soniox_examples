@@ -15,7 +15,7 @@ app = FastAPI()
 def get_stt_config(diarization: bool, lang_id: bool, target: str) -> dict:
     return {
         "api_key": SONIOX_API_KEY,
-        "model": "stt-rt-v4",
+        "model": "stt-rt-v5",
         "audio_format": "auto",
         "enable_endpoint_detection": True,
         "max_endpoint_delay_ms": 500,
@@ -327,4 +327,4 @@ async def tts_keepalive(tts_ws):
         print(f"TTS WS closed: {e}")
 
 
-app.mount("/", StaticFiles(directory="web", html=True), name="static")
+app.mount("/", StaticFiles(directory="frontend", html=True), name="static")

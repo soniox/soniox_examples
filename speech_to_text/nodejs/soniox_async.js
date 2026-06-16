@@ -9,7 +9,7 @@ function getConfig(audioUrl, fileId, translation) {
   const config = {
     // Select the model to use.
     // See: soniox.com/docs/stt/models
-    model: "stt-async-v4",
+    model: "stt-async-v5",
 
     // Set language hints when possible to significantly improve accuracy.
     // See: soniox.com/docs/stt/concepts/language-hints
