@@ -5,7 +5,7 @@ import { parseArgs } from "node:util";
 import process from "process";
 
 const SONIOX_TTS_WEBSOCKET_URL = "wss://tts-rt.soniox.com/tts-websocket";
-const MODEL = "tts-rt-v1";
+const MODEL = "tts-rt-v2";
 const VALID_SAMPLE_RATES = [8000, 16000, 24000, 44100, 48000];
 const VALID_BITRATES = [32000, 64000, 96000, 128000, 192000, 256000, 320000];
 const VALID_AUDIO_FORMATS = [
@@ -71,7 +71,6 @@ function pcmS16leToWav(pcm, { sampleRate, numChannels = 1 }) {
 
 // Get Soniox TTS config.
 function getConfig({
-  apiKey,
   streamId,
   language,
   voice,
@@ -80,9 +79,6 @@ function getConfig({
   bitrate,
 }) {
   const config = {
-    // Get your API key at console.soniox.com, then run: export SONIOX_API_KEY=<YOUR_API_KEY>
-    api_key: apiKey,
-
     // Client-defined stream id to identify this realtime request.
     stream_id: streamId,
 
@@ -144,7 +140,10 @@ function runSession({
 }) {
   return new Promise((resolve, reject) => {
     console.log("Connecting to Soniox...");
-    const ws = new WebSocket(SONIOX_TTS_WEBSOCKET_URL);
+    // Get your API key at console.soniox.com, then run: export SONIOX_API_KEY=<YOUR_API_KEY>
+    const ws = new WebSocket(SONIOX_TTS_WEBSOCKET_URL, {
+      headers: { Authorization: `Bearer ${apiKey}` },
+    });
 
     const audioChunks = [];
 
@@ -169,7 +168,6 @@ function runSession({
 
     ws.on("open", () => {
       const config = getConfig({
-        apiKey,
         streamId,
         language,
         voice,
@@ -197,7 +195,7 @@ function runSession({
       }
 
       // Error from server.
-      // See: soniox.com/docs/api-reference/tts/generate_tts#errors
+      // See: https://soniox.com/docs/api-reference/tts/websocket-api#error-response
       if (res.error_code) {
         console.error(`Error: ${res.error_code} - ${res.error_message}`);
         ws.close();

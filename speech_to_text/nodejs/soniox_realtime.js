@@ -1,15 +1,12 @@
 import fs from "fs";
-import WebSocket from "ws";
 import { parseArgs } from "node:util";
+import WebSocket from "ws";
 
 const SONIOX_WEBSOCKET_URL = "wss://stt-rt.soniox.com/transcribe-websocket";
 
 // Get Soniox STT config
-function getConfig(apiKey, audioFormat, translation) {
+function getConfig(audioFormat, translation) {
   const config = {
-    // Get your API key at console.soniox.com, then run: export SONIOX_API_KEY=<YOUR_API_KEY>
-    api_key: apiKey,
-
     // Select the model to use.
     // See: soniox.com/docs/stt/models
     model: "stt-rt-v5",
@@ -73,7 +70,7 @@ function getConfig(apiKey, audioFormat, translation) {
   }
 
   // Translation options.
-  // See: soniox.com/docs/stt/rt/real-time-translation#translation-modes
+  // See: soniox.com/docs/translation/stt-translation#translation-modes
   if (translation === "one_way") {
     // Translates all languages into the target language.
     config.translation = { type: "one_way", target_language: "es" };
@@ -142,10 +139,13 @@ function renderTokens(finalTokens, nonFinalTokens) {
 }
 
 function runSession(apiKey, audioPath, audioFormat, translation) {
-  const config = getConfig(apiKey, audioFormat, translation);
+  const config = getConfig(audioFormat, translation);
 
   console.log("Connecting to Soniox...");
-  const ws = new WebSocket(SONIOX_WEBSOCKET_URL);
+  // Get your API key at console.soniox.com, then run: export SONIOX_API_KEY=<YOUR_API_KEY>
+  const ws = new WebSocket(SONIOX_WEBSOCKET_URL, {
+    headers: { Authorization: `Bearer ${apiKey}` },
+  });
 
   let finalTokens = [];
 

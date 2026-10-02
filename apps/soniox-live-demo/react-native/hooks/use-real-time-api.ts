@@ -107,7 +107,7 @@ export function useRealTimeAPI({ apiKey, config, callbacks }: UseRealTimeAPIOpti
     const key = await getApiKey();
     if (!key) return;
 
-    const ws = new WebSocket(DEFAULT_WS_URI);
+    const ws = new WebSocket(DEFAULT_WS_URI, ["soniox-api-key", key]);
     wsRef.current = ws;
 
     // Sends STT config to the Soniox, calls user-defined callback (onStarted)
@@ -116,7 +116,6 @@ export function useRealTimeAPI({ apiKey, config, callbacks }: UseRealTimeAPIOpti
       const { audio, translation, languageHints } = configRef.current ?? {};
       // Initial config that is first send to the Soniox
       const config = {
-        api_key: key,
         model: "stt-rt-v5",
         audio_format: audio?.encoding ?? "pcm_s16le",
         sample_rate: audio?.sampleRate ?? 16000,
@@ -125,7 +124,7 @@ export function useRealTimeAPI({ apiKey, config, callbacks }: UseRealTimeAPIOpti
         enable_language_identification: true,
         enable_endpoint_detection: true,
         translation: translation,
-        languageHints,
+        language_hints: languageHints,
       };
       ws.send(JSON.stringify(config));
       updateState("Running");

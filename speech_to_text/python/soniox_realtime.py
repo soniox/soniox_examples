@@ -12,11 +12,8 @@ SONIOX_WEBSOCKET_URL = "wss://stt-rt.soniox.com/transcribe-websocket"
 
 
 # Get Soniox STT config.
-def get_config(api_key: str, audio_format: str, translation: str) -> dict:
+def get_config(audio_format: str, translation: str) -> dict:
     config = {
-        # Get your API key at console.soniox.com, then run: export SONIOX_API_KEY=<YOUR_API_KEY>
-        "api_key": api_key,
-        #
         # Select the model to use.
         # See: soniox.com/docs/stt/models
         "model": "stt-rt-v5",
@@ -79,7 +76,7 @@ def get_config(api_key: str, audio_format: str, translation: str) -> dict:
         raise ValueError(f"Unsupported audio_format: {audio_format}")
 
     # Translation options.
-    # See: soniox.com/docs/stt/rt/real-time-translation#translation-modes
+    # See: soniox.com/docs/translation/stt-translation#translation-modes
     if translation == "none":
         pass
     elif translation == "one_way":
@@ -157,10 +154,14 @@ def run_session(
     audio_format: str,
     translation: str,
 ) -> None:
-    config = get_config(api_key, audio_format, translation)
+    config = get_config(audio_format, translation)
 
     print("Connecting to Soniox...")
-    with connect(SONIOX_WEBSOCKET_URL) as ws:
+    # Get your API key at console.soniox.com, then run: export SONIOX_API_KEY=<YOUR_API_KEY>
+    with connect(
+        SONIOX_WEBSOCKET_URL,
+        additional_headers={"Authorization": f"Bearer {api_key}"},
+    ) as ws:
         # Send first request with config.
         ws.send(json.dumps(config))
 

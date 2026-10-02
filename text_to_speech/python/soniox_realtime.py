@@ -10,7 +10,7 @@ from websockets import ConnectionClosedOK
 from websockets.sync.client import connect
 
 SONIOX_TTS_WEBSOCKET_URL = "wss://tts-rt.soniox.com/tts-websocket"
-MODEL = "tts-rt-v1"
+MODEL = "tts-rt-v2"
 VALID_SAMPLE_RATES = [8000, 16000, 24000, 44100, 48000]
 VALID_BITRATES = [32000, 64000, 96000, 128000, 192000, 256000, 320000]
 VALID_AUDIO_FORMATS = [
@@ -44,7 +44,6 @@ def get_output_path(*, output_path: str, audio_format: str) -> str:
 
 # Get Soniox TTS config.
 def get_config(
-    api_key: str,
     stream_id: str,
     language: str,
     voice: str,
@@ -53,9 +52,6 @@ def get_config(
     bitrate: int | None,
 ) -> dict:
     config: dict[str, Any] = {
-        # Get your API key at console.soniox.com, then run: export SONIOX_API_KEY=<YOUR_API_KEY>
-        "api_key": api_key,
-        #
         # Client-defined stream id to identify this realtime request.
         "stream_id": stream_id,
         #
@@ -108,7 +104,6 @@ def stream_text(lines: list[str], stream_id: str, ws) -> None:
 
 def send_requests(
     ws,
-    api_key: str,
     lines: list[str],
     language: str,
     voice: str,
@@ -118,7 +113,6 @@ def send_requests(
     stream_id: str,
 ) -> None:
     config = get_config(
-        api_key=api_key,
         stream_id=stream_id,
         language=language,
         voice=voice,
@@ -142,14 +136,17 @@ def run_session(
     output_path: str,
 ) -> None:
     print("Connecting to Soniox...")
-    with connect(SONIOX_TTS_WEBSOCKET_URL) as ws:
+    # Get your API key at console.soniox.com, then run: export SONIOX_API_KEY=<YOUR_API_KEY>
+    with connect(
+        SONIOX_TTS_WEBSOCKET_URL,
+        additional_headers={"Authorization": f"Bearer {api_key}"},
+    ) as ws:
         send_errors: list[Exception] = []
 
         def send_worker() -> None:
             try:
                 send_requests(
                     ws,
-                    api_key,
                     lines,
                     language,
                     voice,

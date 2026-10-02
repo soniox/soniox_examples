@@ -8,13 +8,13 @@ load_dotenv(override=True)
 SONIOX_API_KEY = os.environ["SONIOX_API_KEY"]
 STT_URL = "wss://stt-rt.soniox.com/transcribe-websocket"
 TTS_URL = "wss://tts-rt.soniox.com/tts-websocket"
+AUTH_HEADERS = {"Authorization": f"Bearer {SONIOX_API_KEY}"}
 
 app = FastAPI()
 
 
 def get_stt_config(diarization: bool, lang_id: bool, target: str) -> dict:
     return {
-        "api_key": SONIOX_API_KEY,
         "model": "stt-rt-v5",
         "audio_format": "auto",
         "enable_endpoint_detection": True,
@@ -27,7 +27,6 @@ def get_stt_config(diarization: bool, lang_id: bool, target: str) -> dict:
 
 def get_tts_config(stream_id: str, voice: str, lang: str) -> dict:
     return {
-        "api_key": SONIOX_API_KEY,
         "stream_id": stream_id,
         "model": "tts-rt-v1",
         "voice": voice,
@@ -61,7 +60,7 @@ async def translation_websocket(
     # and pipe_tts_to_browser (reads both to decide when the session is over).
     tts_state = {"current_stream_id": None, "stt_done": False}
     try:
-        stt_ws = await websockets.connect(STT_URL)
+        stt_ws = await websockets.connect(STT_URL, additional_headers=AUTH_HEADERS)
         await stt_ws.send(json.dumps(stt_config))
 
         if audio_url and audio_duration:
@@ -75,7 +74,7 @@ async def translation_websocket(
             input_coro = pipe_browser_audio_to_stt(browser_ws=browser_ws, stt_ws=stt_ws)
 
         if tts:
-            tts_ws = await websockets.connect(TTS_URL)
+            tts_ws = await websockets.connect(TTS_URL, additional_headers=AUTH_HEADERS)
 
             tts_idle = asyncio.Event()
             tts_idle.set()  # default: no stream open, free to open one

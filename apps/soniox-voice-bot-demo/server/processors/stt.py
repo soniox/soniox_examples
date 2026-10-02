@@ -77,14 +77,16 @@ class STTProcessor(MessageProcessor):
         self._send_message = send_message
 
         try:
-            self._websocket = await websockets.connect(self._api_host)
+            self._websocket = await websockets.connect(
+                self._api_host,
+                additional_headers={"Authorization": f"Bearer {self._api_key}"},
+            )
         except websockets.exceptions.ConnectionClosed as e:
             self.log.error("Unable to connect to Soniox API", error=e)
             raise
 
         # Send the initial configuration message
         config = {
-            "api_key": self._api_key,
             "model": "stt-rt-preview",
             "enable_endpoint_detection": True,
             "enable_non_final_tokens": True,
